@@ -10,16 +10,23 @@ services:
       - "3306:3306"
     volumes:
       - "./nba_shots_mysql_data:/var/lib/mysql:rw"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysqldatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   pipeline:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/data_pipeline
+      - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@mysqldatabase:3306/data_pipeline
     env_file:
       - .env
     depends_on:
-      - mysqldatabase
-    volumes:
-      - "./:/app"
+      mysqldatabase:
+        condition: service_healthy
+
     command: ["python", "/app/ingest.py"]
 volumes:
   mysql_data:

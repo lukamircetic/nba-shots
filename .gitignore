@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 **/__pycache__
 **/*.pyc
+raw_data
 # C extensions
 *.so
 nba_shots_mysql_data
