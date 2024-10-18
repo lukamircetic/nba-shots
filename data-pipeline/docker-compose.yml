@@ -1,0 +1,25 @@
+services:
+  mysqldatabase:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=data_pipeline
+    env_file:
+      - .env
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./nba_shots_mysql_data:/var/lib/mysql:rw"
+  pipeline:
+    build: .
+    environment:
+      - DATABASE_URL=mysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/data_pipeline
+    env_file:
+      - .env
+    depends_on:
+      - mysqldatabase
+    volumes:
+      - "./:/app"
+    command: ["python", "/app/ingest.py"]
+volumes:
+  mysql_data:
