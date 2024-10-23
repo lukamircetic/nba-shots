@@ -1,8 +1,17 @@
 import pandas as pd
 import os
 from dotenv import load_dotenv
-from sqlalchemy import create_engine, inspect, Integer, String, DateTime, Float, SmallInteger, Boolean
 from pathlib import Path
+from sqlalchemy import (
+    create_engine,
+    inspect,
+    Integer,
+    String,
+    DateTime,
+    Float,
+    SmallInteger,
+    Boolean
+)
 
 shots_dtypes = {
     'PLAYER_ID': Integer(),
@@ -30,8 +39,9 @@ shots_dtypes = {
     'POSITION_GROUP': String(20),
     'POSITION': String(20),
     'HOME_TEAM': String(20),
-    'AWAY_TEAM': String(20),    
+    'AWAY_TEAM': String(20),
 }
+
 
 def ingest_data():
     load_dotenv()
@@ -45,7 +55,7 @@ def ingest_data():
     csv_files = list(path.glob('*.csv'))
     csv_files.sort()
 
-    table_name="shot"
+    table_name = "shot"
     inspector = inspect(engine)
     table_exists = inspector.has_table(table_name)
     print("Shots table exists: ", table_exists)
@@ -57,10 +67,12 @@ def ingest_data():
             for chunk in df:
                 chunk.GAME_DATE = pd.to_datetime(chunk.GAME_DATE)
                 if i == 0 and total_rows == 0:
-                    chunk.head(n=0).to_sql(name=table_name, con=engine, if_exists="replace", dtype=shots_dtypes)
+                    chunk.head(n=0).to_sql(name=table_name, con=engine,
+                                           if_exists="replace", dtype=shots_dtypes)
                 l = len(chunk)
                 total_rows += l
-                chunk.to_sql(name=table_name, con=engine, if_exists="append", dtype=shots_dtypes)
+                chunk.to_sql(name=table_name, con=engine,
+                             if_exists="append", dtype=shots_dtypes)
                 # print("Inserted %d chunks" % l)
             print(f"Total chunks inserted for {file}: {total_rows}")
 
