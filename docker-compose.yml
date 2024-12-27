@@ -44,10 +44,13 @@ services:
       POSTGRES_DB: ${BLUEPRINT_DB_DATABASE}
       POSTGRES_USER: ${BLUEPRINT_DB_USERNAME}
       POSTGRES_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
+      POSTGRES_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
     ports:
       - "${BLUEPRINT_DB_PORT}:5432"
     volumes:
       - psql_volume_bp:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d/migrations
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${BLUEPRINT_DB_USERNAME} -d ${BLUEPRINT_DB_DATABASE}'"]
       interval: 5s
