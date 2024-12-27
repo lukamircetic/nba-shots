@@ -9,12 +9,20 @@ import (
 	"strconv"
 	"time"
 
+	"nba-shots/internal/types"
+
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/lib/pq"
 )
 
 // Service represents a service that interacts with a database.
 type Service interface {
+	InsertPlayers([]types.Player) error
+	// InsertTeams() error
+	// InsertSeasons() error
+	// InsertGames() error
+	// InsertShots() error
 	// Health returns a map of health status information.
 	// The keys and values in the map are service-specific.
 	Health() map[string]string
@@ -52,6 +60,81 @@ func New() Service {
 		db: db,
 	}
 	return dbInstance
+}
+
+func (s *service) beginTransaction() (*sql.Tx, error) {
+	return s.db.Begin()
+}
+
+func (s *service) commitTransaction(tx *sql.Tx) error {
+	return tx.Commit()
+}
+
+func (s *service) rollbackTransaction(tx *sql.Tx) error {
+	return tx.Rollback()
+}
+
+func (s *service) bulkLoadData(tx *sql.Tx, tableName string, columns []string, data [][]interface{}) error {
+	stmt, err := tx.Prepare(pq.CopyIn(tableName, "id", "name"))
+	if err != nil {
+		return err
+	}
+	log.Printf("Statement created: %v\n", stmt)
+
+	defer stmt.Close()
+
+	for _, row := range data {
+		log.Printf("row: %v", row)
+		_, err = stmt.Exec(row...)
+		if err != nil {
+			log.Fatalf("row loading error: %v", err)
+			return err
+		}
+	}
+	log.Println("Executed statements")
+
+	_, err = stmt.Exec()
+	if err != nil {
+		return err
+	}
+	log.Println("Final exec done")
+
+	return stmt.Close()
+}
+
+// InsertPlayers - inserts multiple players into the database.
+func (s *service) InsertPlayers(players []types.Player) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v players\n", len(players))
+
+	columns := types.GetTypeDBColumnNames(types.Player{})
+
+	log.Printf("Columns: %v\n", columns)
+
+	data := make([][]interface{}, len(players))
+
+	for i, player := range players {
+		data[i] = []interface{}{player.ID, player.Name}
+	}
+
+	log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "player", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting players and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
 }
 
 // Health checks the health of the database connection by pinging the database.
