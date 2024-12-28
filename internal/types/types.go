@@ -31,7 +31,6 @@ type Game struct {
 }
 
 type Shot struct {
-	ID            int     `db:"id"`
 	PlayerID      int     `db:"player_id"`
 	GameID        int     `db:"game_id"`
 	TeamID        int     `db:"team_id"`

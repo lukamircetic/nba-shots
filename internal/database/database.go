@@ -136,10 +136,10 @@ func (s *service) InsertTeams(teams []types.Team) error {
 	}
 	log.Printf("Transaction Started with %v teams\n", len(teams))
 
-	query := `INSERT INTO team (id, name) VALUES ($1, $2)`
+	query := `INSERT INTO team (id, name, abbreviation) VALUES ($1, $2, $3)`
 
 	for _, team := range teams {
-		_, err := s.db.Exec(context.Background(), query, team.ID, team.Name)
+		_, err := s.db.Exec(context.Background(), query, team.ID, team.Name, team.Abbreviation)
 		if err != nil {
 			err2 := s.rollbackTransaction(tx)
 			if err2 != nil {
@@ -229,15 +229,17 @@ func (s *service) InsertShots(shots []types.Shot) error {
 
 	for i, shot := range shots {
 		data[i] = []any{
-			shot.ID,
 			shot.PlayerID,
 			shot.GameID,
 			shot.TeamID,
+			shot.HomeTeamID,
+			shot.AwayTeamID,
 			shot.SeasonID,
 			shot.EventType,
 			shot.ShotMade,
 			shot.ActionType,
 			shot.ShotType,
+			shot.BasicZone,
 			shot.ZoneName,
 			shot.ZoneABB,
 			shot.ZoneRange,

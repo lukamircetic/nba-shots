@@ -132,9 +132,9 @@ func (s *Server) InsertGamesHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) InsertShotsHandler(w http.ResponseWriter, r *http.Request) {
 	// Decode the request body
 	var shots = make([]types.Shot, 3)
-	shots[0] = types.Shot{ID: 1, PlayerID: 1, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "2pt", ShotMade: true, ActionType: "jump shot", ShotType: "2pt", ZoneName: "left wing", ZoneABB: "LW", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
-	shots[1] = types.Shot{ID: 2, PlayerID: 2, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "3pt", ShotMade: false, ActionType: "jump shot", ShotType: "3pt", ZoneName: "right wing", ZoneABB: "RW", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
-	shots[2] = types.Shot{ID: 3, PlayerID: 3, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "2pt", ShotMade: true, ActionType: "jump shot", ShotType: "2pt", ZoneName: "top of the key", ZoneABB: "TK", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
+	shots[0] = types.Shot{PlayerID: 1, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "2pt", ShotMade: true, ActionType: "jump shot", ShotType: "2pt", ZoneName: "left wing", ZoneABB: "LW", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
+	shots[1] = types.Shot{PlayerID: 2, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "3pt", ShotMade: false, ActionType: "jump shot", ShotType: "3pt", ZoneName: "right wing", ZoneABB: "RW", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
+	shots[2] = types.Shot{PlayerID: 3, GameID: 1, TeamID: 1, SeasonID: 1, EventType: "2pt", ShotMade: true, ActionType: "jump shot", ShotType: "2pt", ZoneName: "top of the key", ZoneABB: "TK", ZoneRange: "24+", LocX: 0.0, LocY: 0.0, ShotDistance: 24, Quarter: 1, MinsLeft: 11, SecsLeft: 59, Position: "F", PositionGroup: "F"}
 	// Insert the players
 	err := s.db.InsertShots(shots)
 	if err != nil {

@@ -13,10 +13,11 @@ import (
 
 // toggle whether to insert or not
 const (
-	uploadPlayers = true
-	uploadTeams   = true
-	uploadGames   = true
-	uploadShots   = true
+	uploadPlayers = false
+	uploadTeams   = false
+	uploadSeasons = false
+	uploadGames   = false
+	uploadShots   = false
 )
 
 type rawShotData struct {
@@ -52,6 +53,8 @@ func Ingest() {
 	dbService := database.New()
 	defer dbService.Close()
 
+	// need to fix something with docker taking up a lot of disk space and it might be related to these files
+	// docker system prune -a -> this command removed 65gb lol
 	dataDir := filepath.Join("data-pipeline", "raw_data", "nbashots")
 	files, err := filepath.Glob(filepath.Join(dataDir, "*.csv"))
 
@@ -109,18 +112,58 @@ func Ingest() {
 	// get all unique seasons
 	log.Println("Total seasons: ", len(seasons))
 	// get all unique games
-	games := allGames(&all_data)
+	games := allGames(&seasons, &all_data)
 	log.Println("Total games: ", len(games))
 	// get cleaned shots data
-	shots := allShots(&all_data)
+	shots := allShots(&seasons, &all_data)
 	log.Println("Total shots: ", len(shots))
 
 	if uploadPlayers {
+		log.Println("Inserting players to the database...")
 		err := dbService.InsertPlayers(players)
+		log.Println("Commit transaction error for players: ", err)
 		if err != nil {
 			log.Fatalf("error inserting players: %v", err)
 		}
+		log.Printf("Inserted %v players to the players table\n", len(players))
 	}
+
+	if uploadTeams {
+		log.Println("Inserting teams to the database...")
+		err := dbService.InsertTeams(teams)
+		if err != nil {
+			log.Fatalf("error inserting teams: %v", err)
+		}
+		log.Printf("Inserted %v teams to the database\n", len(teams))
+	}
+
+	if uploadSeasons {
+		log.Println("Inserting seasons to the database...")
+		err := dbService.InsertSeasons(seasons)
+		if err != nil {
+			log.Fatalf("error inserting seasons: %v", err)
+		}
+		log.Printf("Inserted %v seasons to the database\n", len(seasons))
+	}
+
+	if uploadGames {
+		log.Println("Inserting games to the database...")
+		err := dbService.InsertGames(games)
+		if err != nil {
+			log.Fatalf("error inserting games: %v", err)
+		}
+		log.Printf("Inserted %v games to the database\n", len(games))
+	}
+
+	if uploadShots {
+		log.Println("Inserting shots to the database...")
+		err := dbService.InsertShots(shots)
+		if err != nil {
+			log.Fatalf("error inserting shots: %v", err)
+		}
+		log.Printf("Inserted %v shots to the database\n", len(shots))
+	}
+
 }
 
 func parseShotRow(row []string) rawShotData {
@@ -211,7 +254,7 @@ GAME_ID	GAME_DATE	HOME_TEAM	AWAY_TEAM	SEASON_1	SEASON_2
 3578254	22000000	2020-12-22	BKN	GSW	2021	2020-21
 3578256	22000000	2020-12-22	LAL	LAC	2021	2020-21
 */
-func allGames(data *[]rawShotData) []types.Game {
+func allGames(seasons *[]types.Season, data *[]rawShotData) []types.Game {
 	seenGames := make(map[int]bool)
 	var uniqueGames []types.Game
 	for _, shot := range *data {
@@ -221,7 +264,7 @@ func allGames(data *[]rawShotData) []types.Game {
 				ID:         shot.GameID,
 				HomeTeamID: teamAbbrevID[shot.HomeTeam],
 				AwayTeamID: teamAbbrevID[shot.AwayTeam],
-				SeasonID:   shot.SeasonEndYear,
+				SeasonID:   seasonIDByYear(seasons, shot.SeasonEndYear),
 				GameDate:   shot.GameDate,
 			})
 		}
@@ -229,16 +272,16 @@ func allGames(data *[]rawShotData) []types.Game {
 	return uniqueGames
 }
 
-func allShots(data *[]rawShotData) []types.Shot {
+func allShots(seasons *[]types.Season, data *[]rawShotData) []types.Shot {
 	var formattedShots []types.Shot
 	for _, shot := range *data {
 		formattedShots = append(formattedShots, types.Shot{
 			PlayerID:      shot.PlayerID,
 			GameID:        shot.GameID,
 			TeamID:        shot.TeamID,
-			SeasonID:      shot.SeasonEndYear,
 			HomeTeamID:    teamAbbrevID[shot.HomeTeam],
 			AwayTeamID:    teamAbbrevID[shot.AwayTeam],
+			SeasonID:      seasonIDByYear(seasons, shot.SeasonEndYear),
 			EventType:     shot.EventType,
 			ShotMade:      shot.ShotMade,
 			ActionType:    shot.ActionType,
@@ -330,7 +373,17 @@ var teamAbbrevID = map[string]int{
 	"NOK": 1610612740,
 }
 
-// [
+// returning -1 is so bad but its literally impossible
+func seasonIDByYear(seasons *[]types.Season, year int) int {
+	for _, season := range *seasons {
+		if season.SeasonEndYear == year {
+			return season.ID
+		}
+	}
+	return -1
+}
+
+// [ .csv format of ingest data
 // 0 SEASON_1: 2004
 // 1 SEASON_2: 2003-04
 // 2 TEAM_ID: 1610612747
