@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"nba-shots/cmd/ingest"
 	"nba-shots/internal/server"
 )
 
@@ -39,6 +40,9 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 func main() {
 
 	server := server.NewServer()
+
+	log.Println("Starting ingest script")
+	ingest.Ingest()
 
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)

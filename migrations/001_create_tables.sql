@@ -2,6 +2,7 @@
 CREATE TABLE IF NOT EXISTS team (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  abbreviation VARCHAR(10) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -37,10 +38,13 @@ CREATE TABLE IF NOT EXISTS shot (
   game_id INTEGER REFERENCES game(id),
   team_id INTEGER REFERENCES team(id),
   season_id INTEGER REFERENCES season(id),
+  home_team_id INTEGER REFERENCES team(id),
+  away_team_id INTEGER REFERENCES team(id),
   event_type VARCHAR(50) NOT NULL,
   shot_made BOOLEAN NOT NULL,
   action_type VARCHAR(50) NOT NULL,
   shot_type VARCHAR(50) NOT NULL,
+  basic_zone VARCHAR(50) NOT NULL,
   zone_name VARCHAR(100) NOT NULL,
   zone_abb VARCHAR(20) NOT NULL,
   zone_range VARCHAR(50) NOT NULL,
@@ -63,4 +67,6 @@ CREATE INDEX idx_game_season_id ON game(season_id);
 CREATE INDEX idx_shot_player_id ON shot(player_id);
 CREATE INDEX idx_shot_game_id ON shot(game_id);
 CREATE INDEX idx_shot_team_id ON shot(team_id);
-
+CREATE INDEX idx_shot_season_id ON shot(season_id);
+CREATE INDEX idx_shot_home_team_id ON shot(home_team_id);
+CREATE INDEX idx_shot_away_team_id ON shot(away_team_id);

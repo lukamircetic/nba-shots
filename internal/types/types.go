@@ -11,8 +11,9 @@ type Player struct {
 }
 
 type Team struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID           int    `db:"id"`
+	Name         string `db:"name"`
+	Abbreviation string `db:"abbreviation"`
 }
 
 type Season struct {
@@ -34,11 +35,14 @@ type Shot struct {
 	PlayerID      int     `db:"player_id"`
 	GameID        int     `db:"game_id"`
 	TeamID        int     `db:"team_id"`
+	HomeTeamID    int     `db:"home_team_id"`
+	AwayTeamID    int     `db:"away_team_id"`
 	SeasonID      int     `db:"season_id"`
 	EventType     string  `db:"event_type"`
 	ShotMade      bool    `db:"shot_made"`
 	ActionType    string  `db:"action_type"`
 	ShotType      string  `db:"shot_type"`
+	BasicZone     string  `db:"basic_zone"`
 	ZoneName      string  `db:"zone_name"`
 	ZoneABB       string  `db:"zone_abb"`
 	ZoneRange     string  `db:"zone_range"`
