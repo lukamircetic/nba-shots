@@ -10,11 +10,17 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/render"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
 	r := chi.NewRouter()
+
+	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.URLFormat)
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -32,6 +38,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.Get("/seasons", s.InsertSeasonHandler)
 	r.Get("/games", s.InsertGamesHandler)
 	r.Get("/shots", s.InsertShotsHandler)
+
+	r.Route("/shots", func(r chi.Router) {
+		r.Use(ShotCtx)
+		r.Get("/", s.getShotsHandler)
+	})
 
 	return r
 }

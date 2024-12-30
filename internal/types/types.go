@@ -55,6 +55,16 @@ type Shot struct {
 	PositionGroup string  `db:"position_group"`
 }
 
+type RequestShotParams struct {
+	PlayerIDs []int `json:"player_id"`
+	TeamIDs   []int `json:"team_id"`
+	SeasonIDs []int `json:"season_id"`
+}
+
+func NewRequestShotParams() *RequestShotParams {
+	return &RequestShotParams{}
+}
+
 func GetTypeDBColumnNames(v interface{}) []string {
 	t := reflect.TypeOf(v)
 	columns := make([]string, t.NumField())
