@@ -65,6 +65,13 @@ func NewRequestShotParams() *RequestShotParams {
 	return &RequestShotParams{}
 }
 
+type ReturnShot struct {
+	LocX     float64 `json:"loc_x"`
+	LocY     float64 `json:"loc_y"`
+	ShotMade bool    `json:"shot_made"`
+	ShotType string  `json:"shot_type"`
+}
+
 func GetTypeDBColumnNames(v interface{}) []string {
 	t := reflect.TypeOf(v)
 	columns := make([]string, t.NumField())

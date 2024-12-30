@@ -21,6 +21,9 @@ type Service interface {
 	InsertSeasons([]types.Season) error
 	InsertGames([]types.Game) error
 	InsertShots([]types.Shot) error
+	QueryShots(string, []interface{}, int) ([]types.ReturnShot, error)
+
+	GetShots(*types.RequestShotParams) ([]types.ReturnShot, error)
 
 	IsEmptyDatabase() (bool, error)
 	Health() map[string]string

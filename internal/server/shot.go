@@ -15,13 +15,6 @@ type shotsContextKey string
 
 const shotArgsKey shotsContextKey = "shotArgs"
 
-type ReturnShot struct {
-	LocX     float64 `json:"loc_x"`
-	LocY     float64 `json:"loc_y"`
-	ShotMade string  `json:"shot_made"`
-	ShotType string  `json:"shot_type"`
-}
-
 func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 	// 1 - parse the query args into a types.RequestShotParams variable
 	queryArgs := r.Context().Value(shotArgsKey).(*types.RequestShotParams)
@@ -29,9 +22,7 @@ func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 	// 1.5 - TODO: validate query args
 
 	// 2 - send the parsed arguments to the db service to get the shots
-	// shots, err := s.db.GetShots(&queryArgs) uncomment when ready
-	shots, err := dummyDBShotsResponse(queryArgs)
-
+	shots, err := s.db.GetShots(queryArgs)
 	if err != nil {
 		render.Render(w, r, ErrInternalServer(err))
 		return
@@ -45,7 +36,7 @@ func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func NewShotListResponse(shots *[]ReturnShot) []render.Renderer {
+func NewShotListResponse(shots *[]types.ReturnShot) []render.Renderer {
 	list := []render.Renderer{}
 	for _, shot := range *shots {
 		list = append(list, NewShotResponse(&shot))
@@ -53,7 +44,7 @@ func NewShotListResponse(shots *[]ReturnShot) []render.Renderer {
 	return list
 }
 
-func NewShotResponse(shot *ReturnShot) *ShotResponse {
+func NewShotResponse(shot *types.ReturnShot) *ShotResponse {
 	resp := &ShotResponse{
 		ReturnShot: shot,
 	}
@@ -61,22 +52,13 @@ func NewShotResponse(shot *ReturnShot) *ShotResponse {
 }
 
 type ShotResponse struct {
-	*ReturnShot
+	*types.ReturnShot
 	Elapsed int64 `json:"elapsed"`
 }
 
 func (rd *ShotResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	rd.Elapsed = 10
 	return nil
-}
-
-// replace with db response
-func dummyDBShotsResponse(args *types.RequestShotParams) ([]ReturnShot, error) {
-	log.Println("Getting shots from db", args)
-	return []ReturnShot{
-		{LocX: 1.5, LocY: 2.2, ShotMade: "made", ShotType: "3pt"},
-		{LocX: 3.1, LocY: 4.5, ShotMade: "missed", ShotType: "2pt"},
-	}, nil
 }
 
 func ShotCtx(next http.Handler) http.Handler {
