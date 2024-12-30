@@ -72,7 +72,7 @@ services:
       BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
       BLUEPRINT_DB_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
     volumes:
-      - ./data-pipeline/raw_data:/app/raw_data
+      - ./raw_data:/app/raw_data
     command: /app/ingest
     depends_on:
       psql_bp:
