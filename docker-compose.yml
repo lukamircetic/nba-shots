@@ -17,9 +17,8 @@ services:
       BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
       BLUEPRINT_DB_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
     volumes:
-      - .:/app
       - air_config:/root/.air
-    command: air
+    command: sh -c "if [ '$APP_ENV' = 'local' ]; then air; else /app/main; fi"
     depends_on:
       psql_bp:
         condition: service_healthy
@@ -59,7 +58,32 @@ services:
       start_period: 15s
     networks:
       - blueprint
-
+  ingest:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    restart: no
+    environment:
+      BLUEPRINT_DB_HOST: ${BLUEPRINT_DB_HOST}
+      BLUEPRINT_DB_PORT: ${BLUEPRINT_DB_PORT}
+      BLUEPRINT_DB_DATABASE: ${BLUEPRINT_DB_DATABASE}
+      BLUEPRINT_DB_USERNAME: ${BLUEPRINT_DB_USERNAME}
+      BLUEPRINT_DB_PASSWORD: ${BLUEPRINT_DB_PASSWORD}
+      BLUEPRINT_DB_SCHEMA: ${BLUEPRINT_DB_SCHEMA}
+    volumes:
+      - ./data-pipeline/raw_data:/app/raw_data
+    command: /app/ingest
+    depends_on:
+      psql_bp:
+        condition: service_healthy
+    networks:
+      - blueprint
+    logging:
+      driver: json-file
+      options:
+        max-size: 200k
+        max-file: 10
 volumes:
   psql_volume_bp:
   air_config:

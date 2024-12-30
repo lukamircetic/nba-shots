@@ -8,14 +8,20 @@ RUN go mod download
 COPY . .
 
 RUN go build -o main cmd/api/main.go
+RUN go build -o ingest cmd/ingest/ingest.go
+RUN echo "Listing /app directory after build 1:" && ls -l /app
 
 FROM golang:1.23-alpine AS prod
 WORKDIR /app
+
 COPY --from=build /app/main /app/main
+COPY --from=build /app/ingest /app/ingest
+COPY data-pipeline/raw_data /app/raw_data
+
+RUN echo "Listing /app directory after build 2:" && ls -l /app
 RUN apk add --no-cache make && go install github.com/air-verse/air@latest
 EXPOSE ${PORT}
 CMD ["air"]
-
 
 FROM node:20 AS frontend_builder
 WORKDIR /frontend

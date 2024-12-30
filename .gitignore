@@ -27,6 +27,7 @@ tmp/
 
 # Project build
 main
+ingest
 *templ.go
 
 # OS X generated file

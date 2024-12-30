@@ -9,3 +9,5 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
 
     \i /docker-entrypoint-initdb.d/migrations/001_create_tables.sql
 EOSQL
+
+echo "Database schema created successfully"
