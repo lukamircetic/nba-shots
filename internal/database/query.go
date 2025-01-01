@@ -10,7 +10,7 @@ import (
 func (s *service) QueryShots(queryString string, args []interface{}, argCount int) ([]types.ReturnShot, error) {
 	var shots []types.ReturnShot
 
-	log.Println("Initiating query with query string and args: ", queryString, args)
+	log.Println("Initiating shots query with query string and args: ", queryString, args)
 
 	rows, err := s.db.Query(context.Background(), queryString, args...)
 

@@ -5,13 +5,17 @@ import (
 	"log"
 	"nba-shots/internal/types"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-chi/render"
 )
 
 type shotsContextKey string
+
+type ShotResponse struct {
+	*types.ReturnShot
+	Elapsed int64 `json:"elapsed"`
+}
 
 const shotArgsKey shotsContextKey = "shotArgs"
 
@@ -51,16 +55,12 @@ func NewShotResponse(shot *types.ReturnShot) *ShotResponse {
 	return resp
 }
 
-type ShotResponse struct {
-	*types.ReturnShot
-	Elapsed int64 `json:"elapsed"`
-}
-
 func (rd *ShotResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	rd.Elapsed = 10
 	return nil
 }
 
+// not really needed since theres only one action on this route, but good practice
 func ShotCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var shotArgs = types.NewRequestShotParams()
@@ -110,17 +110,4 @@ func ShotCtx(next http.Handler) http.Handler {
 		ctx := context.WithValue(r.Context(), shotArgsKey, shotArgs)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
-}
-
-// put in helpers.go
-func ConvertStringSlicetoIntSlice(str []string) ([]int, error) {
-	var ints = make([]int, len(str))
-	for id, s := range str {
-		converted, err := strconv.Atoi(s)
-		if err != nil {
-			return nil, err
-		}
-		ints[id] = converted
-	}
-	return ints, nil
 }

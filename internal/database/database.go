@@ -24,6 +24,12 @@ type Service interface {
 	QueryShots(string, []interface{}, int) ([]types.ReturnShot, error)
 
 	GetShots(*types.RequestShotParams) ([]types.ReturnShot, error)
+	GetPlayerByID(int) (*types.Player, error)
+	GetPlayersByName(string) ([]types.Player, error)
+	GetTeamByID(int) (*types.Team, error)
+	GetAllTeams() ([]types.Team, error)
+	GetSeasonByYear(int) (*types.Season, error)
+	GetAllSeasons() ([]types.Season, error)
 
 	IsEmptyDatabase() (bool, error)
 	Health() map[string]string
