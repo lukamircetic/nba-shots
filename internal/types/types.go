@@ -30,28 +30,29 @@ type Game struct {
 }
 
 type Shot struct {
-	PlayerID      int     `db:"player_id"`
-	GameID        int     `db:"game_id"`
-	TeamID        int     `db:"team_id"`
-	HomeTeamID    int     `db:"home_team_id"`
-	AwayTeamID    int     `db:"away_team_id"`
-	SeasonYear    int     `db:"season_year"`
-	EventType     string  `db:"event_type"`
-	ShotMade      bool    `db:"shot_made"`
-	ActionType    string  `db:"action_type"`
-	ShotType      string  `db:"shot_type"`
-	BasicZone     string  `db:"basic_zone"`
-	ZoneName      string  `db:"zone_name"`
-	ZoneABB       string  `db:"zone_abb"`
-	ZoneRange     string  `db:"zone_range"`
-	LocX          float64 `db:"loc_x"`
-	LocY          float64 `db:"loc_y"`
-	ShotDistance  int     `db:"shot_distance"`
-	Quarter       int     `db:"qtr"`
-	MinsLeft      int     `db:"mins_left"`
-	SecsLeft      int     `db:"secs_left"`
-	Position      string  `db:"position"`
-	PositionGroup string  `db:"position_group"`
+	PlayerID      int       `db:"player_id"`
+	GameID        int       `db:"game_id"`
+	TeamID        int       `db:"team_id"`
+	HomeTeamID    int       `db:"home_team_id"`
+	AwayTeamID    int       `db:"away_team_id"`
+	SeasonYear    int       `db:"season_year"`
+	EventType     string    `db:"event_type"`
+	ShotMade      bool      `db:"shot_made"`
+	ActionType    string    `db:"action_type"`
+	ShotType      string    `db:"shot_type"`
+	BasicZone     string    `db:"basic_zone"`
+	ZoneName      string    `db:"zone_name"`
+	ZoneABB       string    `db:"zone_abb"`
+	ZoneRange     string    `db:"zone_range"`
+	LocX          float64   `db:"loc_x"`
+	LocY          float64   `db:"loc_y"`
+	ShotDistance  int       `db:"shot_distance"`
+	Quarter       int       `db:"qtr"`
+	MinsLeft      int       `db:"mins_left"`
+	SecsLeft      int       `db:"secs_left"`
+	Position      string    `db:"position"`
+	PositionGroup string    `db:"position_group"`
+	GameDate      time.Time `db:"game_date"`
 }
 
 type PlayerTeam struct {
@@ -66,8 +67,9 @@ type PlayerSeason struct {
 }
 
 type PlayerGame struct {
-	PlayerID int `db:"player_id"`
-	GameID   int `db:"game_id"`
+	PlayerID int       `db:"player_id"`
+	GameID   int       `db:"game_id"`
+	GameDate time.Time `db:"game_date"`
 }
 
 type TeamSeason struct {
@@ -77,8 +79,9 @@ type TeamSeason struct {
 }
 
 type TeamGame struct {
-	TeamID int `db:"team_id"`
-	GameID int `db:"game_id"`
+	TeamID   int       `db:"team_id"`
+	GameID   int       `db:"game_id"`
+	GameDate time.Time `db:"game_date"`
 }
 
 type GameSeason struct {

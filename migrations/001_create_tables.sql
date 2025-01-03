@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS shot (
   secs_left SMALLINT NOT NULL,
   position VARCHAR(20) NOT NULL,
   position_group VARCHAR(20) NOT NULL,
+  game_date TIMESTAMP WITH TIME ZONE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -69,7 +70,7 @@ CREATE INDEX idx_shot_team_id ON shot(team_id);
 CREATE INDEX idx_shot_season_id ON shot(season_year);
 CREATE INDEX idx_shot_home_team_id ON shot(home_team_id);
 CREATE INDEX idx_shot_away_team_id ON shot(away_team_id);
-
+CREATE INDEX idx_shot_game_date ON shot(game_date);
 
 CREATE TABLE IF NOT EXISTS player_team (
   player_id INTEGER REFERENCES player(id) NOT NULL,
@@ -91,6 +92,7 @@ CREATE TABLE IF NOT EXISTS player_season (
 CREATE TABLE IF NOT EXISTS player_game (
     player_id INTEGER REFERENCES player(id) NOT NULL,
     game_id INTEGER REFERENCES game(id) NOT NULL,
+    game_date TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (player_id, game_id)
@@ -99,6 +101,7 @@ CREATE TABLE IF NOT EXISTS player_game (
 CREATE TABLE IF NOT EXISTS team_game (
     team_id INTEGER REFERENCES team(id) NOT NULL,
     game_id INTEGER REFERENCES game(id) NOT NULL,
+    game_date TIMESTAMP WITH TIME ZONE NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (team_id, game_id)
@@ -133,3 +136,5 @@ CREATE INDEX idx_team_game_team_id ON team_game(team_id);
 CREATE INDEX idx_team_game_game_id ON team_game(game_id);
 CREATE INDEX idx_game_season_game_id ON game_season(game_id);
 CREATE INDEX idx_game_season_season_year ON game_season(season_year);
+CREATE INDEX idx_team_game_game_date ON team_game(game_date);
+CREATE INDEX idx_player_game_game_date ON player_game(game_date);

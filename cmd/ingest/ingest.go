@@ -394,6 +394,7 @@ func allShots(data *[]rawShotData) *[]types.Shot {
 			SecsLeft:      shot.SecsLeft,
 			Position:      shot.Position,
 			PositionGroup: shot.PositionGroup,
+			GameDate:      shot.GameDate,
 		})
 	}
 	return &formattedShots
@@ -450,24 +451,24 @@ func allPlayerSeasons(data *[]rawShotData) *[]types.PlayerSeason {
 }
 
 func allPlayerGames(data *[]rawShotData) *[]types.PlayerGame {
-	playerGames := make(map[int]map[int]bool)
+	playerGames := make(map[int]map[int]time.Time)
 
 	for _, shot := range *data {
 		if playerGames[shot.PlayerID] == nil {
-			playerGames[shot.PlayerID] = make(map[int]bool)
+			playerGames[shot.PlayerID] = make(map[int]time.Time)
 		}
-		playerGames[shot.PlayerID][shot.GameID] = true
+		playerGames[shot.PlayerID][shot.GameID] = shot.GameDate
 	}
 
 	var playerGame []types.PlayerGame
 	for playerId, games := range playerGames {
-		for gameId, played := range games {
-			if played {
-				playerGame = append(playerGame, types.PlayerGame{
-					PlayerID: playerId,
-					GameID:   gameId,
-				})
-			}
+		for gameId, gameDate := range games {
+			playerGame = append(playerGame, types.PlayerGame{
+				PlayerID: playerId,
+				GameID:   gameId,
+				GameDate: gameDate,
+			})
+
 		}
 	}
 	return &playerGame
@@ -499,24 +500,23 @@ func allTeamSeasons(data *[]rawShotData) *[]types.TeamSeason {
 }
 
 func allTeamGames(data *[]rawShotData) *[]types.TeamGame {
-	teamGames := make(map[int]map[int]bool)
+	teamGames := make(map[int]map[int]time.Time)
 
 	for _, shot := range *data {
 		if teamGames[shot.TeamID] == nil {
-			teamGames[shot.TeamID] = make(map[int]bool)
+			teamGames[shot.TeamID] = make(map[int]time.Time)
 		}
-		teamGames[shot.TeamID][shot.GameID] = true
+		teamGames[shot.TeamID][shot.GameID] = shot.GameDate
 	}
 
 	var teamGame []types.TeamGame
 	for teamId, games := range teamGames {
-		for gameId, played := range games {
-			if played {
-				teamGame = append(teamGame, types.TeamGame{
-					TeamID: teamId,
-					GameID: gameId,
-				})
-			}
+		for gameId, gameDate := range games {
+			teamGame = append(teamGame, types.TeamGame{
+				TeamID:   teamId,
+				GameID:   gameId,
+				GameDate: gameDate,
+			})
 		}
 	}
 	return &teamGame

@@ -166,6 +166,7 @@ func (s *service) InsertShots(shots []types.Shot) error {
 			shot.SecsLeft,
 			shot.Position,
 			shot.PositionGroup,
+			shot.GameDate,
 		}
 	}
 
@@ -269,7 +270,7 @@ func (s *service) InsertPlayerGames(playerGames []types.PlayerGame) error {
 	data := make([][]any, len(playerGames))
 
 	for i, playerGame := range playerGames {
-		data[i] = []any{playerGame.PlayerID, playerGame.GameID}
+		data[i] = []any{playerGame.PlayerID, playerGame.GameID, playerGame.GameDate}
 	}
 
 	// log.Printf("data interface: %v\n", data)
@@ -337,7 +338,7 @@ func (s *service) InsertTeamGames(teamGames []types.TeamGame) error {
 	data := make([][]any, len(teamGames))
 
 	for i, teamGame := range teamGames {
-		data[i] = []any{teamGame.TeamID, teamGame.GameID}
+		data[i] = []any{teamGame.TeamID, teamGame.GameID, teamGame.GameDate}
 	}
 
 	// log.Printf("data interface: %v\n", data)
