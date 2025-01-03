@@ -13,11 +13,12 @@ import (
 
 // toggle whether to insert or not
 const (
-	uploadPlayers = true
-	uploadTeams   = true
-	uploadSeasons = true
-	uploadGames   = true
-	uploadShots   = true
+	uploadPlayers     = true
+	uploadTeams       = true
+	uploadSeasons     = true
+	uploadGames       = true
+	uploadShots       = true
+	uploadPlayerTeams = true
 )
 
 type rawShotData struct {
@@ -67,72 +68,72 @@ func main() {
 
 		if uploadPlayers {
 			// get all unique players
-			players := allPlayers(&allData)
-			log.Println("Total parsed players: ", len(players))
+			players := allPlayers(allData)
+			log.Println("Total parsed players: ", len(*players))
 			// insert into db
 			log.Println("Inserting players to the database...")
-			err := dbService.InsertPlayers(players)
+			err := dbService.InsertPlayers(*players)
 			// log.Println("Commit transaction error for players: ", err)
 			if err != nil {
 				log.Fatalf("error inserting players: %v", err)
 			}
-			log.Printf("Inserted %v players to the players table\n", len(players))
+			log.Printf("Inserted %v players to the players table\n", len(*players))
 		}
 
 		if uploadTeams {
 			// get all unique teams
-			teams := allTeams(&allData)
-			log.Println("Total teams: ", len(teams))
+			teams := allTeams(allData)
+			log.Println("Total teams: ", len(*teams))
 
 			// insert into db
 			log.Println("Inserting teams to the database...")
-			err := dbService.InsertTeams(teams)
+			err := dbService.InsertTeams(*teams)
 			if err != nil {
 				log.Fatalf("error inserting teams: %v", err)
 			}
-			log.Printf("Inserted %v teams to the database\n", len(teams))
+			log.Printf("Inserted %v teams to the database\n", len(*teams))
 		}
 
 		if uploadSeasons {
 			// all unique seasons
-			log.Println("Total seasons: ", len(seasons))
+			log.Println("Total seasons: ", len(*seasons))
 			log.Println("Inserting seasons to the database...")
-			err := dbService.InsertSeasons(seasons)
+			err := dbService.InsertSeasons(*seasons)
 			if err != nil {
 				log.Fatalf("error inserting seasons: %v", err)
 			}
-			log.Printf("Inserted %v seasons to the database\n", len(seasons))
+			log.Printf("Inserted %v seasons to the database\n", len(*seasons))
 		}
 
 		if uploadGames {
 			// get all unique games
-			games := allGames(&seasons, &allData)
-			log.Println("Total games: ", len(games))
+			games := allGames(seasons, allData)
+			log.Println("Total games: ", len(*games))
 			// insert into db
 			log.Println("Inserting games to the database...")
-			err := dbService.InsertGames(games)
+			err := dbService.InsertGames(*games)
 			if err != nil {
 				log.Fatalf("error inserting games: %v", err)
 			}
-			log.Printf("Inserted %v games to the database\n", len(games))
+			log.Printf("Inserted %v games to the database\n", len(*games))
 		}
 
 		if uploadShots {
 			// get cleaned shots data
-			shots := allShots(&seasons, &allData)
-			log.Println("Total shots: ", len(shots))
+			shots := allShots(seasons, allData)
+			log.Println("Total shots: ", len(*shots))
 			// insert into db
 			log.Println("Inserting shots to the database...")
-			err := dbService.InsertShots(shots)
+			err := dbService.InsertShots(*shots)
 			if err != nil {
 				log.Fatalf("error inserting shots: %v", err)
 			}
-			log.Printf("Inserted %v shots to the database\n", len(shots))
+			log.Printf("Inserted %v shots to the database\n", len(*shots))
 		}
 	}
 }
 
-func readAndParseShotsCSV() ([]rawShotData, []types.Season) {
+func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 	// need to fix something with docker taking up a lot of disk space and it might be related to these files
 	// docker system prune -a -> this command removed 65gb lol
 	dataDir := filepath.Join("raw_data", "nbashots")
@@ -180,7 +181,7 @@ func readAndParseShotsCSV() ([]rawShotData, []types.Season) {
 		f.Close()
 	}
 	log.Println("Total records: ", len(all_data))
-	return all_data, seasons
+	return &all_data, &seasons
 }
 
 func parseShotRow(row []string) rawShotData {
@@ -227,7 +228,7 @@ func parseShotRow(row []string) rawShotData {
 	}
 }
 
-func allPlayers(data *[]rawShotData) []types.Player {
+func allPlayers(data *[]rawShotData) *[]types.Player {
 	seenPlayers := make(map[int]bool)
 	var uniquePlayers []types.Player
 	for _, shot := range *data {
@@ -239,19 +240,20 @@ func allPlayers(data *[]rawShotData) []types.Player {
 			})
 		}
 	}
-	return uniquePlayers
+	return &uniquePlayers
 }
 
 // for now i will keep the latest team name with the team
-// TODO: when team_season table is created, we will need to update this
-func allTeams(data *[]rawShotData) []types.Team {
+func allTeams(data *[]rawShotData) *[]types.Team {
 	seenTeams := make(map[int]string)
+
 	var uniqueTeams []types.Team
 	for _, shot := range *data {
 		if seenTeams[shot.TeamID] != shot.TeamName {
 			seenTeams[shot.TeamID] = shot.TeamName
 		}
 	}
+
 	for teamID, teamName := range seenTeams {
 		uniqueTeams = append(uniqueTeams, types.Team{
 			ID:           teamID,
@@ -259,7 +261,7 @@ func allTeams(data *[]rawShotData) []types.Team {
 			Abbreviation: teamIDAbbrev[teamID],
 		})
 	}
-	return uniqueTeams
+	return &uniqueTeams
 }
 
 // theres 5 games in 2021 with the same game_id - i'll deal with those later
@@ -271,7 +273,7 @@ GAME_ID	GAME_DATE	HOME_TEAM	AWAY_TEAM	SEASON_1	SEASON_2
 3578254	22000000	2020-12-22	BKN	GSW	2021	2020-21
 3578256	22000000	2020-12-22	LAL	LAC	2021	2020-21
 */
-func allGames(seasons *[]types.Season, data *[]rawShotData) []types.Game {
+func allGames(seasons *[]types.Season, data *[]rawShotData) *[]types.Game {
 	seenGames := make(map[int]bool)
 	var uniqueGames []types.Game
 	for _, shot := range *data {
@@ -286,10 +288,10 @@ func allGames(seasons *[]types.Season, data *[]rawShotData) []types.Game {
 			})
 		}
 	}
-	return uniqueGames
+	return &uniqueGames
 }
 
-func allShots(seasons *[]types.Season, data *[]rawShotData) []types.Shot {
+func allShots(seasons *[]types.Season, data *[]rawShotData) *[]types.Shot {
 	var formattedShots []types.Shot
 	for _, shot := range *data {
 		formattedShots = append(formattedShots, types.Shot{
@@ -317,8 +319,158 @@ func allShots(seasons *[]types.Season, data *[]rawShotData) []types.Shot {
 			PositionGroup: shot.PositionGroup,
 		})
 	}
-	return formattedShots
+	return &formattedShots
 }
+
+func allPlayerTeams(data *[]rawShotData) *[]types.PlayerTeam {
+	var playerTeams []types.PlayerTeam
+
+	// for each team check if that player has played for them
+	playersOnTeams := make(map[int]map[int]string)
+	for _, shot := range *data {
+		if playersOnTeams[shot.TeamID] == nil {
+			playersOnTeams[shot.TeamID] = make(map[int]string)
+		}
+		playersOnTeams[shot.TeamID][shot.PlayerID] = shot.TeamName
+	}
+
+	for teamId, players := range playersOnTeams {
+		for playerId, teamName := range players {
+			if teamName != "" {
+				playerTeams = append(playerTeams, types.PlayerTeam{
+					PlayerID: playerId,
+					TeamID:   teamId,
+					TeamName: teamName,
+				})
+			}
+		}
+	}
+	return &playerTeams
+}
+
+func allPlayerSeasons(data *[]rawShotData, seasonsData *[]types.Season) *[]types.PlayerSeason {
+	// for each player check if they have played in that season
+	playerSeasons := make(map[int]map[int]bool)
+	for _, shot := range *data {
+		if playerSeasons[shot.PlayerID] == nil {
+			playerSeasons[shot.PlayerID] = make(map[int]bool)
+		}
+		playerSeasons[shot.PlayerID][shot.SeasonEndYear] = true
+	}
+
+	var playerSeason []types.PlayerSeason
+	for playerId, seasons := range playerSeasons {
+		for year, played := range seasons {
+			if played {
+				playerSeason = append(playerSeason, types.PlayerSeason{
+					PlayerID: playerId,
+					SeasonID: seasonIDByYear(seasonsData, year),
+				})
+			}
+		}
+	}
+	return &playerSeason
+}
+
+func allPlayerGames(data *[]rawShotData) *[]types.PlayerGame {
+	playerGames := make(map[int]map[int]bool)
+
+	for _, shot := range *data {
+		if playerGames[shot.PlayerID] == nil {
+			playerGames[shot.PlayerID] = make(map[int]bool)
+		}
+		playerGames[shot.PlayerID][shot.GameID] = true
+	}
+
+	var playerGame []types.PlayerGame
+	for playerId, games := range playerGames {
+		for gameId, played := range games {
+			if played {
+				playerGame = append(playerGame, types.PlayerGame{
+					PlayerID: playerId,
+					GameID:   gameId,
+				})
+			}
+		}
+	}
+	return &playerGame
+}
+
+func allTeamSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.TeamSeason {
+	teamSeasons := make(map[int]map[int]string)
+
+	for _, shot := range *data {
+		if teamSeasons[shot.TeamID] == nil {
+			teamSeasons[shot.TeamID] = make(map[int]string)
+		}
+		teamSeasons[shot.TeamID][shot.SeasonEndYear] = shot.TeamName
+	}
+
+	var teamSeason []types.TeamSeason
+	for teamId, seasons := range teamSeasons {
+		for year, name := range seasons {
+			if name != "" {
+				teamSeason = append(teamSeason, types.TeamSeason{
+					TeamID:   teamId,
+					SeasonID: seasonIDByYear(seasonData, year),
+					TeamName: name,
+				})
+			}
+		}
+	}
+	return &teamSeason
+}
+
+func allTeamGames(data *[]rawShotData) *[]types.TeamGame {
+	teamGames := make(map[int]map[int]bool)
+
+	for _, shot := range *data {
+		if teamGames[shot.TeamID] == nil {
+			teamGames[shot.TeamID] = make(map[int]bool)
+		}
+		teamGames[shot.TeamID][shot.GameID] = true
+	}
+
+	var teamGame []types.TeamGame
+	for teamId, games := range teamGames {
+		for gameId, played := range games {
+			if played {
+				teamGame = append(teamGame, types.TeamGame{
+					TeamID: teamId,
+					GameID: gameId,
+				})
+			}
+		}
+	}
+	return &teamGame
+}
+
+func allGameSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.GameSeason {
+	gameSeasons := make(map[int]map[int]bool)
+	for _, shot := range *data {
+		if gameSeasons[shot.GameID] == nil {
+			gameSeasons[shot.GameID] = make(map[int]bool)
+		}
+		gameSeasons[shot.GameID][shot.SeasonEndYear] = true
+	}
+
+	var gameSeasonsList []types.GameSeason
+	for gameId, seasons := range gameSeasons {
+		for year, played := range seasons {
+			if played {
+				gameSeasonsList = append(gameSeasonsList, types.GameSeason{
+					GameID:   gameId,
+					SeasonID: seasonIDByYear(seasonData, year),
+				})
+			}
+		}
+	}
+	return &gameSeasonsList
+}
+
+// func allPlayerTeamSeasons(data *rawShotData, seasonData *types.Season) types.PlayerTeamSeason {
+
+// }
 
 var teamIDAbbrev = map[int]string{
 	1610612747: "LAL",

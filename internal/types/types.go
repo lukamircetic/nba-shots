@@ -55,6 +55,45 @@ type Shot struct {
 	PositionGroup string  `db:"position_group"`
 }
 
+type PlayerTeam struct {
+	PlayerID int    `db:"player_id"`
+	TeamID   int    `db:"team_id"`
+	TeamName string `db:"team_name"`
+}
+
+type PlayerSeason struct {
+	PlayerID int `db:"player_id"`
+	SeasonID int `db:"season_id"`
+}
+
+type PlayerGame struct {
+	PlayerID int `db:"player_id"`
+	GameID   int `db:"game_id"`
+}
+
+type TeamSeason struct {
+	TeamID   int    `db:"team_id"`
+	SeasonID int    `db:"season_id"`
+	TeamName string `db:"team_name"`
+}
+
+type TeamGame struct {
+	TeamID int `db:"team_id"`
+	GameID int `db:"game_id"`
+}
+
+type GameSeason struct {
+	GameID   int `db:"game_id"`
+	SeasonID int `db:"season_id"`
+}
+
+type PlayerTeamSeason struct {
+	PlayerID int    `db:"player_id"`
+	TeamID   int    `db:"team_id"`
+	SeasonID int    `db:"season_id"`
+	TeamName string `db:"team_name"`
+}
+
 type RequestShotParams struct {
 	PlayerIDs []int `json:"player_id"`
 	TeamIDs   []int `json:"team_id"`

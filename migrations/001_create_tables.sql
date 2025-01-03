@@ -70,3 +70,80 @@ CREATE INDEX idx_shot_team_id ON shot(team_id);
 CREATE INDEX idx_shot_season_id ON shot(season_id);
 CREATE INDEX idx_shot_home_team_id ON shot(home_team_id);
 CREATE INDEX idx_shot_away_team_id ON shot(away_team_id);
+
+
+CREATE TABLE IF NOT EXISTS player_team (
+  player_id INTEGER REFERENCES player(id) NOT NULL,
+  team_id INTEGER REFERENCES team(id) NOT NULL,
+  team_name VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  PRIMARY KEY (player_id, team_id)
+);
+
+CREATE TABLE IF NOT EXISTS player_season (
+    player_id INTEGER REFERENCES player(id) NOT NULL,
+    season_id INTEGER REFERENCES season(id) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (player_id, season_id)
+);
+
+CREATE TABLE IF NOT EXISTS player_game (
+    player_id INTEGER REFERENCES player(id) NOT NULL,
+    game_id INTEGER REFERENCES game(id) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (player_id, game_id)
+);
+
+CREATE TABLE IF NOT EXISTS team_game (
+    team_id INTEGER REFERENCES team(id) NOT NULL,
+    game_id INTEGER REFERENCES game(id) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (player_id, game_id)
+);
+
+CREATE TABLE IF NOT EXISTS team_season (
+    team_id INTEGER REFERENCES team(id) NOT NULL,
+    season_id INTEGER REFERENCES season(id) NOT NULL,
+    team_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (team_id, season_id)
+);
+
+CREATE TABLE IF NOT EXISTS game_season (
+    game_id INTEGER REFERENCES game(id) NOT NULL,
+    season_id INTEGER REFERENCES season(id) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (game_id, season_id)
+);
+
+CREATE TABLE IF NOT EXISTS player_team_season (
+    player_id INTEGER REFERENCES player(id) NOT NULL,
+    team_id INTEGER REFERENCES team(id) NOT NULL,
+    season_id INTEGER REFERENCES season(id) NOT NULL,
+    team_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    PRIMARY KEY (player_id, team_id, season_id)
+)
+
+CREATE INDEX idx_player_team_player_id ON player_team(player_id);
+CREATE INDEX idx_player_team_team_id ON player_team(team_id);
+CREATE INDEX idx_player_season_player_id ON player_season(player_id);
+CREATE INDEX idx_player_season_season_id ON player_season(season_id);
+CREATE INDEX idx_player_game_player_id ON player_game(player_id);
+CREATE INDEX idx_player_game_game_id ON player_game(game_id);
+CREATE INDEX idx_team_season_team_id ON team_season(team_id);
+CREATE INDEX idx_team_season_season_id ON team_season(season_id);
+CREATE INDEX idx_team_game_team_id ON team_game(team_id);
+CREATE INDEX idx_team_game_game_id ON team_game(game_id);
+CREATE INDEX idx_game_season_game_id ON game_season(game_id);
+CREATE INDEX idx_game_season_season_id ON game_season(season_id);
+CREATE INDEX idx_player_team_season_player_id ON player_team_season(player_id);
+CREATE INDEX idx_player_team_season_team_id ON player_team_season(team_id);
+CREATE INDEX idx_player_team_season_season_id ON player_team_season(season_id);
