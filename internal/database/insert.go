@@ -185,3 +185,208 @@ func (s *service) InsertShots(shots []types.Shot) error {
 	return s.commitTransaction(tx)
 
 }
+
+// InsertPlayerTeams - inserts multiple player teams into the database.
+func (s *service) InsertPlayerTeams(playerTeams []types.PlayerTeam) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v players teams\n", len(playerTeams))
+
+	columns := types.GetTypeDBColumnNames(types.PlayerTeam{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(playerTeams))
+
+	for i, playerTeam := range playerTeams {
+		data[i] = []any{playerTeam.PlayerID, playerTeam.TeamID, playerTeam.TeamName}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "player_team", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting player teams and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}
+
+func (s *service) InsertPlayerSeasons(playerSeasons []types.PlayerSeason) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v players seasons\n", len(playerSeasons))
+
+	columns := types.GetTypeDBColumnNames(types.PlayerSeason{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(playerSeasons))
+
+	for i, playerTeam := range playerSeasons {
+		data[i] = []any{playerTeam.PlayerID, playerTeam.SeasonID}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "player_season", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting player seasons and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}
+
+func (s *service) InsertPlayerGames(playerGames []types.PlayerGame) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v players games\n", len(playerGames))
+
+	columns := types.GetTypeDBColumnNames(types.PlayerGame{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(playerGames))
+
+	for i, playerGame := range playerGames {
+		data[i] = []any{playerGame.PlayerID, playerGame.GameID}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "player_game", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting players and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}
+
+func (s *service) InsertTeamSeasons(teamSeasons []types.TeamSeason) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v team seasons\n", len(teamSeasons))
+
+	columns := types.GetTypeDBColumnNames(types.TeamSeason{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(teamSeasons))
+
+	for i, teamSeason := range teamSeasons {
+		data[i] = []any{teamSeason.TeamID, teamSeason.SeasonID, teamSeason.TeamName}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "team_season", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting team seasons and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}
+
+func (s *service) InsertTeamGames(teamGames []types.TeamGame) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v team games\n", len(teamGames))
+
+	columns := types.GetTypeDBColumnNames(types.TeamGame{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(teamGames))
+
+	for i, teamGame := range teamGames {
+		data[i] = []any{teamGame.TeamID, teamGame.GameID}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "team_game", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting team games and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}
+
+func (s *service) InsertGameSeasons(gameSeasons []types.GameSeason) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Transaction Started with %v game seasons\n", len(gameSeasons))
+
+	columns := types.GetTypeDBColumnNames(types.GameSeason{})
+
+	// log.Printf("Columns: %v\n", columns)
+
+	data := make([][]any, len(gameSeasons))
+
+	for i, teamGame := range gameSeasons {
+		data[i] = []any{teamGame.GameID, teamGame.SeasonID}
+	}
+
+	// log.Printf("data interface: %v\n", data)
+
+	err = s.bulkLoadData(tx, "game_season", columns, data)
+
+	if err != nil {
+		log.Fatalf("bulk loading error: %v", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting game seasons and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+
+	return s.commitTransaction(tx)
+
+}

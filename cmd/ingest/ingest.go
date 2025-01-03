@@ -13,12 +13,17 @@ import (
 
 // toggle whether to insert or not
 const (
-	uploadPlayers     = true
-	uploadTeams       = true
-	uploadSeasons     = true
-	uploadGames       = true
-	uploadShots       = true
-	uploadPlayerTeams = true
+	uploadPlayers       = true
+	uploadTeams         = true
+	uploadSeasons       = true
+	uploadGames         = true
+	uploadShots         = false
+	uploadPlayerTeams   = true
+	uploadPlayerSeasons = true
+	uploadPlayerGames   = true
+	uploadTeamSeasons   = true
+	uploadTeamGames     = true
+	uploadGameSeasons   = true
 )
 
 type rawShotData struct {
@@ -130,6 +135,79 @@ func main() {
 			}
 			log.Printf("Inserted %v shots to the database\n", len(*shots))
 		}
+
+		if uploadPlayerTeams {
+			playerTeams := allPlayerTeams(allData)
+			log.Println("Total playerTeams: ", len(*playerTeams))
+			// insert into db
+			log.Println("Inserting shots to the database...")
+			err := dbService.InsertPlayerTeams(*playerTeams)
+			if err != nil {
+				log.Fatalf("error inserting playerSeasons: %v", err)
+			}
+			log.Printf("Inserted %v player teams to the database\n", len(*playerTeams))
+		}
+
+		if uploadPlayerSeasons {
+			playerSeasons := allPlayerSeasons(allData, seasons)
+			log.Println("Total playerSeasons: ", len(*playerSeasons))
+			// insert into db
+			log.Println("Inserting player seasons to the database...")
+			err := dbService.InsertPlayerSeasons(*playerSeasons)
+			if err != nil {
+				log.Fatalf("error inserting playerSeasons: %v", err)
+			}
+			log.Printf("Inserted %v player seasons to the database\n", len(*playerSeasons))
+		}
+
+		if uploadPlayerGames {
+			playerGames := allPlayerGames(allData)
+			log.Println("Total playerGames: ", len(*playerGames))
+			// insert into db
+			log.Println("Inserting playerGames to the database...")
+			err := dbService.InsertPlayerGames(*playerGames)
+			if err != nil {
+				log.Fatalf("error inserting playerGames: %v", err)
+			}
+			log.Printf("Inserted %v player games to the database\n", len(*playerGames))
+		}
+
+		if uploadTeamSeasons {
+			teamSeasons := allTeamSeasons(allData, seasons)
+			log.Println("Total teamSeasons: ", len(*teamSeasons))
+			// insert into db
+			log.Println("Inserting teamSeasons to the database...")
+			err := dbService.InsertTeamSeasons(*teamSeasons)
+			if err != nil {
+				log.Fatalf("error inserting teamSeasons: %v", err)
+			}
+			log.Printf("Inserted %v team seasons to the database\n", len(*teamSeasons))
+		}
+
+		if uploadTeamGames {
+			teamGames := allTeamGames(allData)
+			log.Println("Total teamGames: ", len(*teamGames))
+			// insert into db
+			log.Println("Inserting teamGames to the database...")
+			err := dbService.InsertTeamGames(*teamGames)
+			if err != nil {
+				log.Fatalf("error inserting teamGames: %v", err)
+			}
+			log.Printf("Inserted %v team games to the database\n", len(*teamGames))
+		}
+
+		if uploadGameSeasons {
+			gameSeasons := allGameSeasons(allData, seasons)
+			log.Println("Total gameSeasons: ", len(*gameSeasons))
+			// insert into db
+			log.Println("Inserting gameSeasons to the database...")
+			err := dbService.InsertGameSeasons(*gameSeasons)
+			if err != nil {
+				log.Fatalf("error inserting gameSeasons: %v", err)
+			}
+			log.Printf("Inserted %v game seasons to the database\n", len(*gameSeasons))
+		}
+
 	}
 }
 
@@ -467,10 +545,6 @@ func allGameSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.Ga
 	}
 	return &gameSeasonsList
 }
-
-// func allPlayerTeamSeasons(data *rawShotData, seasonData *types.Season) types.PlayerTeamSeason {
-
-// }
 
 var teamIDAbbrev = map[int]string{
 	1610612747: "LAL",
