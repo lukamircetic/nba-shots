@@ -9,8 +9,8 @@ import (
 func (s *service) GetSeasonByYear(year int) (*types.Season, error) {
 	log.Println("Querying database for year", year)
 	season := &types.Season{}
-	query := `SELECT id, season_end_year, season_years FROM season WHERE season_end_year = $1`
-	err := s.db.QueryRow(context.Background(), query, year).Scan(&season.ID, &season.SeasonEndYear, &season.SeasonYears)
+	query := `SELECT year, season_years FROM season WHERE year = $1`
+	err := s.db.QueryRow(context.Background(), query, year).Scan(&season.Year, &season.SeasonYears)
 	if err != nil {
 		return nil, err
 	}
@@ -20,7 +20,7 @@ func (s *service) GetSeasonByYear(year int) (*types.Season, error) {
 func (s *service) GetAllSeasons() ([]types.Season, error) {
 	log.Println("Querying database for all seasons")
 	seasons := []types.Season{}
-	query := `SELECT id, season_end_year, season_years FROM season`
+	query := `SELECT year, season_years FROM season`
 
 	rows, err := s.db.Query(context.Background(), query)
 
@@ -33,8 +33,7 @@ func (s *service) GetAllSeasons() ([]types.Season, error) {
 	for rows.Next() {
 		var season types.Season
 		err := rows.Scan(
-			&season.ID,
-			&season.SeasonEndYear,
+			&season.Year,
 			&season.SeasonYears,
 		)
 

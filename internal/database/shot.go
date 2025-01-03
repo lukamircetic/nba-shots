@@ -69,8 +69,8 @@ func (q *ShotQuery) buildWhereClause() {
 	}
 	// log.Println("Finished team where: ", q.WhereConditions, q.Args)
 
-	if len(q.RequestArgs.SeasonIDs) > 0 {
-		q.addWhereLogicforInts(q.RequestArgs.SeasonIDs, "season_id")
+	if len(q.RequestArgs.SeasonYears) > 0 {
+		q.addWhereLogicforInts(q.RequestArgs.SeasonYears, "season_year")
 	}
 	// log.Println("Finished season where: ", q.WhereConditions, q.Args)
 }

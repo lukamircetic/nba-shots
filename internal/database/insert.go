@@ -74,18 +74,18 @@ func (s *service) InsertSeasons(seasons []types.Season) error {
 	}
 	log.Printf("Transaction Started with %v seasons\n", len(seasons))
 
-	query := `INSERT INTO season (id, season_end_year, season_years) VALUES ($1, $2, $3)`
+	query := `INSERT INTO season (year, season_years) VALUES ($1, $2)`
 
 	for _, season := range seasons {
-		_, err := s.db.Exec(context.Background(), query, season.ID, season.SeasonEndYear, season.SeasonYears)
+		_, err := s.db.Exec(context.Background(), query, season.Year, season.SeasonYears)
 		if err != nil {
 			err2 := s.rollbackTransaction(tx)
 			if err2 != nil {
 				log.Printf("error inserting seasons and rolling back: %v, %v", err, err2)
 				return fmt.Errorf("error inserting seasons and rolling back: %v, %v", err, err2)
 			}
-			log.Printf("failed to insert season %v: %v, transaction rolled back", season.SeasonEndYear, err)
-			return fmt.Errorf("failed to insert seasons %v: %v, transaction rolled back", season.SeasonEndYear, err)
+			log.Printf("failed to insert season %v: %v, transaction rolled back", season.Year, err)
+			return fmt.Errorf("failed to insert seasons %v: %v, transaction rolled back", season.Year, err)
 		}
 	}
 
@@ -107,7 +107,7 @@ func (s *service) InsertGames(games []types.Game) error {
 	data := make([][]any, len(games))
 
 	for i, game := range games {
-		data[i] = []any{game.ID, game.HomeTeamID, game.AwayTeamID, game.SeasonID, game.GameDate}
+		data[i] = []any{game.ID, game.HomeTeamID, game.AwayTeamID, game.SeasonYear, game.GameDate}
 	}
 
 	// log.Printf("data interface: %v\n", data)
@@ -149,7 +149,7 @@ func (s *service) InsertShots(shots []types.Shot) error {
 			shot.TeamID,
 			shot.HomeTeamID,
 			shot.AwayTeamID,
-			shot.SeasonID,
+			shot.SeasonYear,
 			shot.EventType,
 			shot.ShotMade,
 			shot.ActionType,
@@ -235,7 +235,7 @@ func (s *service) InsertPlayerSeasons(playerSeasons []types.PlayerSeason) error 
 	data := make([][]any, len(playerSeasons))
 
 	for i, playerTeam := range playerSeasons {
-		data[i] = []any{playerTeam.PlayerID, playerTeam.SeasonID}
+		data[i] = []any{playerTeam.PlayerID, playerTeam.SeasonYear}
 	}
 
 	// log.Printf("data interface: %v\n", data)
@@ -303,7 +303,7 @@ func (s *service) InsertTeamSeasons(teamSeasons []types.TeamSeason) error {
 	data := make([][]any, len(teamSeasons))
 
 	for i, teamSeason := range teamSeasons {
-		data[i] = []any{teamSeason.TeamID, teamSeason.SeasonID, teamSeason.TeamName}
+		data[i] = []any{teamSeason.TeamID, teamSeason.SeasonYear, teamSeason.TeamName}
 	}
 
 	// log.Printf("data interface: %v\n", data)
@@ -371,7 +371,7 @@ func (s *service) InsertGameSeasons(gameSeasons []types.GameSeason) error {
 	data := make([][]any, len(gameSeasons))
 
 	for i, teamGame := range gameSeasons {
-		data[i] = []any{teamGame.GameID, teamGame.SeasonID}
+		data[i] = []any{teamGame.GameID, teamGame.SeasonYear}
 	}
 
 	// log.Printf("data interface: %v\n", data)

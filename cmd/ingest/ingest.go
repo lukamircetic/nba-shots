@@ -17,7 +17,7 @@ const (
 	uploadTeams         = true
 	uploadSeasons       = true
 	uploadGames         = true
-	uploadShots         = false
+	uploadShots         = true
 	uploadPlayerTeams   = true
 	uploadPlayerSeasons = true
 	uploadPlayerGames   = true
@@ -227,7 +227,7 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 	// once those tables are populated then shot can be populated
 	var all_data []rawShotData
 	var seasons []types.Season
-	for i, file := range files {
+	for _, file := range files {
 		f, err := os.Open(file)
 
 		if err != nil {
@@ -249,9 +249,8 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 			// get the season data from this file since it will be the same for all records
 			if j == 0 {
 				seasons = append(seasons, types.Season{
-					ID:            i,
-					SeasonEndYear: typedRow.SeasonEndYear,
-					SeasonYears:   typedRow.SeasonYears,
+					Year:        typedRow.SeasonEndYear,
+					SeasonYears: typedRow.SeasonYears,
 				})
 			}
 		}
@@ -361,7 +360,7 @@ func allGames(seasons *[]types.Season, data *[]rawShotData) *[]types.Game {
 				ID:         shot.GameID,
 				HomeTeamID: teamAbbrevID[shot.HomeTeam],
 				AwayTeamID: teamAbbrevID[shot.AwayTeam],
-				SeasonID:   seasonIDByYear(seasons, shot.SeasonEndYear),
+				SeasonYear: shot.SeasonEndYear,
 				GameDate:   shot.GameDate,
 			})
 		}
@@ -378,7 +377,7 @@ func allShots(seasons *[]types.Season, data *[]rawShotData) *[]types.Shot {
 			TeamID:        shot.TeamID,
 			HomeTeamID:    teamAbbrevID[shot.HomeTeam],
 			AwayTeamID:    teamAbbrevID[shot.AwayTeam],
-			SeasonID:      seasonIDByYear(seasons, shot.SeasonEndYear),
+			SeasonYear:    shot.SeasonEndYear,
 			EventType:     shot.EventType,
 			ShotMade:      shot.ShotMade,
 			ActionType:    shot.ActionType,
@@ -441,8 +440,8 @@ func allPlayerSeasons(data *[]rawShotData, seasonsData *[]types.Season) *[]types
 		for year, played := range seasons {
 			if played {
 				playerSeason = append(playerSeason, types.PlayerSeason{
-					PlayerID: playerId,
-					SeasonID: seasonIDByYear(seasonsData, year),
+					PlayerID:   playerId,
+					SeasonYear: year,
 				})
 			}
 		}
@@ -489,9 +488,9 @@ func allTeamSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.Te
 		for year, name := range seasons {
 			if name != "" {
 				teamSeason = append(teamSeason, types.TeamSeason{
-					TeamID:   teamId,
-					SeasonID: seasonIDByYear(seasonData, year),
-					TeamName: name,
+					TeamID:     teamId,
+					SeasonYear: year,
+					TeamName:   name,
 				})
 			}
 		}
@@ -537,8 +536,8 @@ func allGameSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.Ga
 		for year, played := range seasons {
 			if played {
 				gameSeasonsList = append(gameSeasonsList, types.GameSeason{
-					GameID:   gameId,
-					SeasonID: seasonIDByYear(seasonData, year),
+					GameID:     gameId,
+					SeasonYear: year,
 				})
 			}
 		}
@@ -614,16 +613,6 @@ var teamAbbrevID = map[string]int{
 	"NOH": 1610612740,
 	"NJN": 1610612751,
 	"NOK": 1610612740,
-}
-
-// returning -1 is so bad but its literally impossible
-func seasonIDByYear(seasons *[]types.Season, year int) int {
-	for _, season := range *seasons {
-		if season.SeasonEndYear == year {
-			return season.ID
-		}
-	}
-	return -1
 }
 
 // [ .csv format of ingest data

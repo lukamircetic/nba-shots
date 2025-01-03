@@ -93,7 +93,7 @@ func ShotCtx(next http.Handler) http.Handler {
 			shotArgs.TeamIDs = teamIds
 		}
 
-		seasonQueryParams := r.URL.Query().Get("season_id")
+		seasonQueryParams := r.URL.Query().Get("season")
 		if seasonQueryParams != "" {
 			log.Println("season Ids passed in", seasonQueryParams)
 			seasonStringIds := strings.Split(seasonQueryParams, ",")
@@ -103,7 +103,7 @@ func ShotCtx(next http.Handler) http.Handler {
 				render.Render(w, r, ErrInvalidRequest(err))
 			}
 
-			shotArgs.SeasonIDs = seasonIds
+			shotArgs.SeasonYears = seasonIds
 		}
 
 		log.Println("shotArgs", shotArgs)

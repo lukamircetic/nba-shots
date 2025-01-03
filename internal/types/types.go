@@ -17,16 +17,15 @@ type Team struct {
 }
 
 type Season struct {
-	ID            int    `db:"id"`
-	SeasonEndYear int    `db:"season_end_year"`
-	SeasonYears   string `db:"season_years"`
+	Year        int    `db:"year"`
+	SeasonYears string `db:"season_years"`
 }
 
 type Game struct {
 	ID         int       `db:"id"`
 	HomeTeamID int       `db:"home_team_id"`
 	AwayTeamID int       `db:"away_team_id"`
-	SeasonID   int       `db:"season_id"`
+	SeasonYear int       `db:"season_year"`
 	GameDate   time.Time `db:"game_date"`
 }
 
@@ -36,7 +35,7 @@ type Shot struct {
 	TeamID        int     `db:"team_id"`
 	HomeTeamID    int     `db:"home_team_id"`
 	AwayTeamID    int     `db:"away_team_id"`
-	SeasonID      int     `db:"season_id"`
+	SeasonYear    int     `db:"season_year"`
 	EventType     string  `db:"event_type"`
 	ShotMade      bool    `db:"shot_made"`
 	ActionType    string  `db:"action_type"`
@@ -62,8 +61,8 @@ type PlayerTeam struct {
 }
 
 type PlayerSeason struct {
-	PlayerID int `db:"player_id"`
-	SeasonID int `db:"season_id"`
+	PlayerID   int `db:"player_id"`
+	SeasonYear int `db:"season_year"`
 }
 
 type PlayerGame struct {
@@ -72,9 +71,9 @@ type PlayerGame struct {
 }
 
 type TeamSeason struct {
-	TeamID   int    `db:"team_id"`
-	SeasonID int    `db:"season_id"`
-	TeamName string `db:"team_name"`
+	TeamID     int    `db:"team_id"`
+	SeasonYear int    `db:"season_year"`
+	TeamName   string `db:"team_name"`
 }
 
 type TeamGame struct {
@@ -83,21 +82,21 @@ type TeamGame struct {
 }
 
 type GameSeason struct {
-	GameID   int `db:"game_id"`
-	SeasonID int `db:"season_id"`
+	GameID     int `db:"game_id"`
+	SeasonYear int `db:"season_year"`
 }
 
 type PlayerTeamSeason struct {
-	PlayerID int    `db:"player_id"`
-	TeamID   int    `db:"team_id"`
-	SeasonID int    `db:"season_id"`
-	TeamName string `db:"team_name"`
+	PlayerID   int    `db:"player_id"`
+	TeamID     int    `db:"team_id"`
+	SeasonYear int    `db:"season_year"`
+	TeamName   string `db:"team_name"`
 }
 
 type RequestShotParams struct {
-	PlayerIDs []int `json:"player_id"`
-	TeamIDs   []int `json:"team_id"`
-	SeasonIDs []int `json:"season_id"`
+	PlayerIDs   []int `json:"player_id"`
+	TeamIDs     []int `json:"team_id"`
+	SeasonYears []int `json:"season_year"`
 }
 
 func NewRequestShotParams() *RequestShotParams {
