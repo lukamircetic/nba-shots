@@ -112,7 +112,7 @@ func main() {
 
 		if uploadGames {
 			// get all unique games
-			games := allGames(seasons, allData)
+			games := allGames(allData)
 			log.Println("Total games: ", len(*games))
 			// insert into db
 			log.Println("Inserting games to the database...")
@@ -125,7 +125,7 @@ func main() {
 
 		if uploadShots {
 			// get cleaned shots data
-			shots := allShots(seasons, allData)
+			shots := allShots(allData)
 			log.Println("Total shots: ", len(*shots))
 			// insert into db
 			log.Println("Inserting shots to the database...")
@@ -149,7 +149,7 @@ func main() {
 		}
 
 		if uploadPlayerSeasons {
-			playerSeasons := allPlayerSeasons(allData, seasons)
+			playerSeasons := allPlayerSeasons(allData)
 			log.Println("Total playerSeasons: ", len(*playerSeasons))
 			// insert into db
 			log.Println("Inserting player seasons to the database...")
@@ -173,7 +173,7 @@ func main() {
 		}
 
 		if uploadTeamSeasons {
-			teamSeasons := allTeamSeasons(allData, seasons)
+			teamSeasons := allTeamSeasons(allData)
 			log.Println("Total teamSeasons: ", len(*teamSeasons))
 			// insert into db
 			log.Println("Inserting teamSeasons to the database...")
@@ -197,7 +197,7 @@ func main() {
 		}
 
 		if uploadGameSeasons {
-			gameSeasons := allGameSeasons(allData, seasons)
+			gameSeasons := allGameSeasons(allData)
 			log.Println("Total gameSeasons: ", len(*gameSeasons))
 			// insert into db
 			log.Println("Inserting gameSeasons to the database...")
@@ -350,7 +350,7 @@ GAME_ID	GAME_DATE	HOME_TEAM	AWAY_TEAM	SEASON_1	SEASON_2
 3578254	22000000	2020-12-22	BKN	GSW	2021	2020-21
 3578256	22000000	2020-12-22	LAL	LAC	2021	2020-21
 */
-func allGames(seasons *[]types.Season, data *[]rawShotData) *[]types.Game {
+func allGames(data *[]rawShotData) *[]types.Game {
 	seenGames := make(map[int]bool)
 	var uniqueGames []types.Game
 	for _, shot := range *data {
@@ -368,7 +368,7 @@ func allGames(seasons *[]types.Season, data *[]rawShotData) *[]types.Game {
 	return &uniqueGames
 }
 
-func allShots(seasons *[]types.Season, data *[]rawShotData) *[]types.Shot {
+func allShots(data *[]rawShotData) *[]types.Shot {
 	var formattedShots []types.Shot
 	for _, shot := range *data {
 		formattedShots = append(formattedShots, types.Shot{
@@ -425,7 +425,7 @@ func allPlayerTeams(data *[]rawShotData) *[]types.PlayerTeam {
 	return &playerTeams
 }
 
-func allPlayerSeasons(data *[]rawShotData, seasonsData *[]types.Season) *[]types.PlayerSeason {
+func allPlayerSeasons(data *[]rawShotData) *[]types.PlayerSeason {
 	// for each player check if they have played in that season
 	playerSeasons := make(map[int]map[int]bool)
 	for _, shot := range *data {
@@ -473,7 +473,7 @@ func allPlayerGames(data *[]rawShotData) *[]types.PlayerGame {
 	return &playerGame
 }
 
-func allTeamSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.TeamSeason {
+func allTeamSeasons(data *[]rawShotData) *[]types.TeamSeason {
 	teamSeasons := make(map[int]map[int]string)
 
 	for _, shot := range *data {
@@ -522,7 +522,7 @@ func allTeamGames(data *[]rawShotData) *[]types.TeamGame {
 	return &teamGame
 }
 
-func allGameSeasons(data *[]rawShotData, seasonData *[]types.Season) *[]types.GameSeason {
+func allGameSeasons(data *[]rawShotData) *[]types.GameSeason {
 	gameSeasons := make(map[int]map[int]bool)
 	for _, shot := range *data {
 		if gameSeasons[shot.GameID] == nil {
