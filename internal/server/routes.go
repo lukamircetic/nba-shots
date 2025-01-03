@@ -53,6 +53,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/all", s.getAllSeasonsHandler)
 	})
 
+	r.Route("/game", func(r chi.Router) {
+		r.Route("/{gameID}", func(r chi.Router) {
+			r.Get("/", s.getGameByIDHandler)
+		})
+		r.Get("/last/{numGames}", s.getLastXGamesHandler)
+	})
+
 	r.Route("/shots", func(r chi.Router) {
 		r.Use(ShotCtx)
 		r.Get("/", s.getShotsHandler)

@@ -36,6 +36,8 @@ type Service interface {
 	GetAllTeams() ([]types.Team, error)
 	GetSeasonByYear(int) (*types.Season, error)
 	GetAllSeasons() ([]types.Season, error)
+	GetGameByID(int) (*types.Game, error)
+	GetLastXGames(int) ([]types.Game, error)
 
 	IsEmptyDatabase() (bool, error)
 	Health() map[string]string

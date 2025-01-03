@@ -13,17 +13,17 @@ import (
 
 // toggle whether to insert or not
 const (
-	uploadPlayers       = true
-	uploadTeams         = true
-	uploadSeasons       = true
-	uploadGames         = true
-	uploadShots         = true
-	uploadPlayerTeams   = true
-	uploadPlayerSeasons = true
-	uploadPlayerGames   = true
-	uploadTeamSeasons   = true
-	uploadTeamGames     = true
-	uploadGameSeasons   = true
+	uploadPlayers       = false
+	uploadTeams         = false
+	uploadSeasons       = false
+	uploadGames         = false
+	uploadShots         = false
+	uploadPlayerTeams   = false
+	uploadPlayerSeasons = false
+	uploadPlayerGames   = false
+	uploadTeamSeasons   = false
+	uploadTeamGames     = false
+	uploadGameSeasons   = false
 )
 
 type rawShotData struct {
