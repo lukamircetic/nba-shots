@@ -1,58 +1,101 @@
-import { useState } from 'react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './components/ui/accordion'
+import { InputWithButton } from './components/ui/inputwithbutton'
+import { DataTable } from './components/ui/data-table'
+import { playerColumns, playerData } from './columndefs/player'
+import { teamColumns, teamData } from './columndefs/team'
+import { seasonColumns, seasonData } from './columndefs/season'
+import React from 'react'
+import { Badge } from './components/ui/badge'
+import { Button } from './components/ui/button'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [message, setMessage] = useState<string>('')
+  const [playerSelection, setPlayerSelection] = React.useState<Record<string, boolean>>({})
+  const [teamSelection, setTeamSelection] = React.useState<Record<string, boolean>>({})
+  const [seasonSelection, setSeasonSelection] = React.useState<Record<string, boolean>>({})
 
-  const fetchData = () => {
-    fetch(`http://localhost:${import.meta.env.VITE_PORT}/`)
-      .then(response => response.text())
-      .then(data => setMessage(data))
-      .catch(error => console.error('Error fetching data:', error))
-  }
+  const selectedPlayers = React.useMemo(() => {
+    return playerData.filter((player) => playerSelection[player.id]);
+  }, [playerSelection]);
+  const selectedTeams = React.useMemo(() => {
+    return teamData.filter((team) => teamSelection[team.id]);
+  }, [teamSelection]);
+  const selectedSeasons = React.useMemo(() => {
+    return seasonData.filter((season) => seasonSelection[season.id]);
+  }, [seasonSelection]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto space-y-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Welcome to Vite + React
-          </h1>
-          <p className="text-gray-600">
-            Get started by editing <code className="text-sm bg-gray-100 p-1 rounded">src/App.tsx</code>
-          </p>
+    <div className="min-h-svh flex flex-col px-14 bg-background relative">
+      <div className='w-full flex flex-col py-16 items-start justify-items-start space-y-2'>
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">nba shots</h1>
+        <h1 className="lg:text-xl text-lg text-muted-foreground ">advanced shot querying and visualization</h1>
+      </div>
+      <div className='flex flex-row flex-1'>
+        <div className='w-1/4 flex flex-col'>
+          {/* Filters div */}
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Filters</h3>
+          <Accordion type="multiple">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>Players</AccordionTrigger>
+              <AccordionContent>
+                <div className='ml-[1px] space-y-4 max-w-sm'>
+                  <InputWithButton />
+                  <DataTable data={playerData} columns={playerColumns} rowSelection={playerSelection} setRowSelection={setPlayerSelection} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Teams</AccordionTrigger>
+              <AccordionContent>
+                <div className='ml-[1px] space-y-4 max-w-sm'>
+                  <DataTable data={teamData} columns={teamColumns} rowSelection={teamSelection} setRowSelection={setTeamSelection} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>Seasons</AccordionTrigger>
+              <AccordionContent>
+                <div className='ml-[1px] space-y-4 max-w-sm'>
+                  <DataTable data={seasonData} columns={seasonColumns} rowSelection={seasonSelection} setRowSelection={setSeasonSelection} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="text-center space-y-4">
-            <button
-              onClick={() => setCount((count) => count + 1)}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
-            >
-              Count is {count}
-            </button>
-            
-            <button
-              onClick={fetchData}
-              className="block w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md transition-colors"
-            >
-              Fetch from Server
-            </button>
-
-            {message && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-md">
-                <p className="text-gray-700">Server Response:</p>
-                <p className="text-gray-900 font-medium">{message}</p>
-              </div>
-            )}
+        <div className='w-1/5 flex flex-col'>
+          {/* Shot Chart div */}
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Selected Filters</h3>
+          <div>
+            <ul className='space-y-1'>
+              {selectedPlayers.map((player, key) => (
+                <li key={key}>
+                  <Badge variant="default" className='p-2 min-w-36 justify-center'>{player.name}</Badge>
+                </li>
+              ))}
+              {selectedTeams.map((team, key) => (
+                <li key={key}>
+                  <Badge variant="default" className='p-2 min-w-36 justify-center'>{team.name}</Badge>
+                </li>
+              ))}
+              {selectedSeasons.map((season, key) => (
+                <li key={key}>
+                  <Badge variant="default" className='p-2 min-w-36 justify-center'>{season.id}</Badge>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <Button variant="secondary">Generate Shot Chart</Button>
           </div>
         </div>
+        <div className='flex-1'>
+          {/* Shot Chart div */}
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Shot Chart</h3>
+          <div className='bg-slate-700 h-4/5 w-full'>
 
-        <div className="text-center text-gray-500 text-sm">
-          Built with Vite, React, and Tailwind CSS
+          </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }
 
