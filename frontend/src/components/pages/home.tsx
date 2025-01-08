@@ -15,10 +15,9 @@ function Home() {
   const [playerSelection, setPlayerSelection] = React.useState<Record<string, boolean>>({})
   const [teamSelection, setTeamSelection] = React.useState<Record<string, boolean>>({})
   const [seasonSelection, setSeasonSelection] = React.useState<Record<string, boolean>>({})
-  const [playerSearchKey, setPlayerSearchKey] = React.useState<string>('Jay')
+  const [playerSearchKey, setPlayerSearchKey] = React.useState<string>('')
 
   const handleGenShots = () => {
-    console.log("gen clicked", isShotsFetching)
     if (!isShotsFetching) {
       refetch()
     }
@@ -28,6 +27,7 @@ function Home() {
     queryKey: ["players", playerSearchKey],
     queryFn: ({ queryKey }) => {
       const [, name] = queryKey
+      if (name == '') return [] // probably a better way to do this
       return fetchPlayersByName(name)
     },
   })
