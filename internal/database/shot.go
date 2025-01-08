@@ -41,7 +41,7 @@ func (s *service) GetShots(args *types.RequestShotParams) ([]types.ReturnShot, e
 }
 
 func (q *ShotQuery) buildQueryString() (string, error) {
-	queryString := `SELECT loc_x, loc_y, shot_made, shot_type FROM shot `
+	queryString := `SELECT id, loc_x, loc_y, shot_made, shot_type FROM shot `
 
 	q.buildWhereClause()
 

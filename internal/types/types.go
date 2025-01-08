@@ -6,19 +6,19 @@ import (
 )
 
 type Player struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
+	ID   int    `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
 }
 
 type Team struct {
-	ID           int    `db:"id"`
-	Name         string `db:"name"`
-	Abbreviation string `db:"abbreviation"`
+	ID           int    `db:"id" json:"id"`
+	Name         string `db:"name" json:"name"`
+	Abbreviation string `db:"abbreviation" json:"abbreviation"`
 }
 
 type Season struct {
-	Year        int    `db:"year"`
-	SeasonYears string `db:"season_years"`
+	Year        int    `db:"year" json:"id"`
+	SeasonYears string `db:"season_years" json:"season_years"`
 }
 
 type Game struct {
@@ -107,6 +107,7 @@ func NewRequestShotParams() *RequestShotParams {
 }
 
 type ReturnShot struct {
+	ID       int     `json:"id"`
 	LocX     float64 `json:"loc_x"`
 	LocY     float64 `json:"loc_y"`
 	ShotMade bool    `json:"shot_made"`

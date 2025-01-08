@@ -23,6 +23,7 @@ func (s *service) QueryShots(queryString string, args []interface{}, argCount in
 	for rows.Next() {
 		var shot types.ReturnShot
 		err := rows.Scan(
+			&shot.ID,
 			&shot.LocX,
 			&shot.LocY,
 			&shot.ShotMade,
