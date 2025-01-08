@@ -1,3 +1,5 @@
+import { HasId } from "@/components/ui/data-table"
+
 type PlayerResponse = {
   id: number,
   name: string,
@@ -14,6 +16,15 @@ type TeamResponse = {
 type SeasonResponse = {
   id: number,
   season_years: string,
+  elapsed: number,
+}
+
+type ShotResponse = {
+  id: number,
+  loc_x: number,
+  loc_y: string,
+  shot_made: number,
+  shot_type: number,
   elapsed: number,
 }
 
@@ -58,4 +69,38 @@ export async function fetchAllSeasons() {
     id: season.id.toString(),
     season_years: season.season_years,
   }))
+}
+
+export async function fetchShotsWithFilters(players?: HasId[], teams?: HasId[], seasons?: HasId[]) {
+  let queryString = 'http://localhost:8080/shots' + '?'
+  let filters = {
+    "player_id": players ? createIdFilterString(players) : undefined,
+    "team_id": teams ? createIdFilterString(teams) : undefined,
+    "season": seasons ? createIdFilterString(seasons) : undefined,
+  }
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) {
+      queryString += `&${key}=${value}`
+    }
+  })
+
+  const response = await fetch(queryString)
+  const data: ShotResponse[] = await response.json()
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch teams")
+  }
+
+  return data.map((shot) => ({
+    id: shot.id.toString(),
+    loc_x: shot.loc_x,
+    loc_y: shot.loc_y,
+    shot_made: shot.shot_made,
+    shot_type: shot.shot_type,
+  }))
+}
+
+function createIdFilterString(arr: HasId[]) {
+  return arr?.map((item) => item.id).join(",")
 }

@@ -24,7 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface HasId {
+export interface HasId {
   id: string;
 }
 

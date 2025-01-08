@@ -3,78 +3,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 
-export type Team = {
-  id: string
+export interface Season {
+  id: string,
+  season_years: string,
 }
 
-export const seasonData: Team[] = [
-  {
-    id: "2004",
-  },
-  {
-    id: "2005",
-  },
-  {
-    id: "2006",
-  },
-  {
-    id: "2007",
-  },
-  {
-    id: "2008",
-  },
-  {
-    id: "2009",
-  },
-  {
-    id: "2010",
-  },
-  {
-    id: "2011",
-  },
-  {
-    id: "2012",
-  },
-  {
-    id: "2013",
-  },
-  {
-    id: "2014",
-  },
-  {
-    id: "2015",
-  },
-  {
-    id: "2016",
-  },
-  {
-    id: "2017",
-  },
-  {
-    id: "2018",
-  },
-  {
-    id: "2019",
-  },
-  {
-    id: "2020",
-  },
-  {
-    id: "2021",
-  },
-  {
-    id: "2022",
-  },
-  {
-    id: "2023",
-  },
-  {
-    id: "2024",
-  },
-]
-
-
-export const seasonColumns: ColumnDef<Team>[] = [
+export const seasonColumns: ColumnDef<Season>[] = [
   {
     id: "select",
     header: ({ table }) => (

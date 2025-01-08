@@ -1,21 +1,28 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion'
 import { InputWithButton } from '../ui/inputwithbutton'
 import { DataTable } from '../ui/data-table'
-import { playerColumns, playerData } from '../../columndefs/player'
-import { teamColumns, teamData } from '../../columndefs/team'
-import { seasonColumns, seasonData } from '../../columndefs/season'
+import { playerColumns } from '../../columndefs/player'
+import { teamColumns } from '../../columndefs/team'
+import { seasonColumns } from '../../columndefs/season'
 import React from 'react'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
-import { fetchAllSeasons, fetchAllTeams, fetchPlayersByName } from '@/api/queries'
+import { fetchAllSeasons, fetchAllTeams, fetchPlayersByName, fetchShotsWithFilters } from '@/api/queries'
 import { useQuery } from '@tanstack/react-query'
+import { ScrollArea } from '../ui/scroll-area'
 
 function Home() {
   const [playerSelection, setPlayerSelection] = React.useState<Record<string, boolean>>({})
   const [teamSelection, setTeamSelection] = React.useState<Record<string, boolean>>({})
   const [seasonSelection, setSeasonSelection] = React.useState<Record<string, boolean>>({})
-
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>('Jay')
+
+  const handleGenShots = () => {
+    console.log("gen clicked", isShotsFetching)
+    if (!isShotsFetching) {
+      refetch()
+    }
+  }
 
   const { isPending: isPlayerPending, isError: isPlayerError, data: playerData, error: playerError } = useQuery({
     queryKey: ["players", playerSearchKey],
@@ -44,6 +51,15 @@ function Home() {
   const selectedSeasons = React.useMemo(() => {
     return seasonData?.filter((season) => seasonSelection[season.id]);
   }, [seasonSelection, seasonData]);
+
+  const { isPending: isShotsPending, isFetching: isShotsFetching, isError: isShotsError, data: shotsData, error: shotsError, refetch } = useQuery({
+    queryKey: [selectedPlayers, selectedTeams, selectedSeasons],
+    queryFn: ({ queryKey }) => {
+      const [p, t, s] = queryKey
+      return fetchShotsWithFilters(p, t, s)
+    },
+    enabled: false,
+  })
 
   return (
     <div className="min-h-svh flex flex-col px-14 bg-background relative">
@@ -110,13 +126,27 @@ function Home() {
             </ul>
           </div>
           <div>
-            <Button variant="secondary">Generate Shot Chart</Button>
+            <Button variant="secondary" onClick={handleGenShots}>Generate Shot Chart</Button>
           </div>
         </div>
         <div className='flex-1'>
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Shot Chart</h3>
-          <div className='bg-slate-700 h-4/5 w-full'>
-
+          <div className='bg-slate-700 h-[70lvh] w-full'>
+            <ScrollArea className='h-full w-full'>
+              <div className="p-4">
+                <h4 className="mb-4 text-sm font-medium leading-none text-white">Shots</h4>
+                {isShotsPending && <div>Please run a query</div>}
+                {isShotsFetching && <div>Loading...</div>}
+                {isShotsError && <div>{`Error fetching shots: ${shotsError.message}`}</div>}
+                {shotsData && shotsData.map((shot) => (
+                  <div key={shot.id} className="flex items-center justify-between">
+                    <p className="text-sm">{`Location - x: ${shot.loc_x} y: ${shot.loc_y}`}</p>
+                    <p className="text-sm">{shot.shot_type}</p>
+                    <p className="text-sm">{shot.shot_made ? "Made" : "Missed"}</p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         </div>
       </div >

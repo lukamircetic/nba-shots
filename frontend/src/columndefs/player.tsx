@@ -3,30 +3,11 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 
-export type Player = {
+export interface Player {
   id: string
   name: string
   position?: string
 }
-
-export const playerData: Player[] = [
-  {
-    id: "1",
-    name: "LeBron James",
-    position: "SF",
-  },
-  {
-    id: "2",
-    name: "Nikola Jokic",
-    position: "C",
-  },
-  {
-    id: "3",
-    name: "Jayson Tatum",
-    position: "SG",
-  },
-]
-
 
 export const playerColumns: ColumnDef<Player>[] = [
   {
