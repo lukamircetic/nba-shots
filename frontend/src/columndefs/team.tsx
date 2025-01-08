@@ -6,28 +6,14 @@ import { ArrowUpDown } from "lucide-react"
 export type Team = {
   id: string
   name: string
+  abbreviation: string,
 }
 
 export const teamData: Team[] = [
   {
     id: "1",
     name: "Los Angeles Lakers",
-  },
-  {
-    id: "2",
-    name: "Boston Celtics",
-  },
-  {
-    id: "3",
-    name: "Denver Nuggets",
-  },
-  {
-    id: "4",
-    name: "Chicago Bulls",
-  },
-  {
-    id: "5",
-    name: "Toronto Raptors",
+    abbreviation: "LAL",
   },
 ]
 

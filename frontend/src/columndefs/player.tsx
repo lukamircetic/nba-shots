@@ -6,7 +6,7 @@ import { ArrowUpDown } from "lucide-react"
 export type Player = {
   id: string
   name: string
-  position: string
+  position?: string
 }
 
 export const playerData: Player[] = [

@@ -99,7 +99,7 @@ export function DataTable<TData extends HasId, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className={cell.column.id === 'select' ? 'w-12' : 'w-64'}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
