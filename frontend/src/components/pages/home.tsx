@@ -10,6 +10,7 @@ import { Button } from '../ui/button'
 import { fetchAllSeasons, fetchAllTeams, fetchPlayersByName, fetchShotsWithFilters } from '@/api/queries'
 import { useQuery } from '@tanstack/react-query'
 import { ScrollArea } from '../ui/scroll-area'
+import BasketballCourt from '../viz/basketball-court'
 
 function Home() {
   const [playerSelection, setPlayerSelection] = React.useState<Record<string, boolean>>({})
@@ -131,22 +132,21 @@ function Home() {
         </div>
         <div className='flex-1'>
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Shot Chart</h3>
-          <div className='bg-slate-700 h-[70lvh] w-full'>
+          <div className='h-[70lvh] w-full'>
             <ScrollArea className='h-full w-full'>
               <div className="p-4">
                 <h4 className="mb-4 text-sm font-medium leading-none text-white">Shots</h4>
                 {isShotsPending && <div>Please run a query</div>}
                 {isShotsFetching && <div>Loading...</div>}
                 {isShotsError && <div>{`Error fetching shots: ${shotsError.message}`}</div>}
-                {shotsData && shotsData.map((shot) => (
-                  <div key={shot.id} className="flex items-center justify-between">
-                    <p className="text-sm">{`Location - x: ${shot.loc_x} y: ${shot.loc_y}`}</p>
-                    <p className="text-sm">{shot.shot_type}</p>
-                    <p className="text-sm">{shot.shot_made ? "Made" : "Missed"}</p>
+                {shotsData &&
+                  <div className="">
+                    <BasketballCourt shots={shotsData} />
                   </div>
-                ))}
+                }
               </div>
             </ScrollArea>
+
           </div>
         </div>
       </div >

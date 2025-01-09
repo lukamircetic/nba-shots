@@ -22,8 +22,8 @@ type SeasonResponse = {
 type ShotResponse = {
   id: number,
   loc_x: number,
-  loc_y: string,
-  shot_made: number,
+  loc_y: number,
+  shot_made: boolean,
   shot_type: number,
   elapsed: number,
 }
@@ -94,10 +94,10 @@ export async function fetchShotsWithFilters(players?: HasId[], teams?: HasId[], 
 
   return data.map((shot) => ({
     id: shot.id.toString(),
-    loc_x: shot.loc_x,
-    loc_y: shot.loc_y,
-    shot_made: shot.shot_made,
-    shot_type: shot.shot_type,
+    locX: shot.loc_x,
+    locY: shot.loc_y,
+    shotMade: shot.shot_made,
+    shotType: shot.shot_type,
   }))
 }
 
