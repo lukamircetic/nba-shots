@@ -1,7 +1,7 @@
 interface Shot {
-  locX: number;
-  locY: number;
-  shotMade: boolean;
+  locX: number
+  locY: number
+  shotMade: boolean
 }
 
 interface BasketballCourtProps {
@@ -15,7 +15,7 @@ function BasketballCourt({
   shots = [],
   shotRadius = 0.3,
   showMadeShots = true,
-  showMissedShots = true
+  showMissedShots = true,
 }: BasketballCourtProps) {
   const SCALE = 1
   const RADIUS_3PT = 23.75 * SCALE
@@ -32,27 +32,26 @@ function BasketballCourt({
   const COURT_Y = 50 * SCALE
   const COURT_X = 50 * SCALE
 
-
   function generateArc(
     radius: number,
     startAngle: number,
     endAngle: number,
     centerX: number,
     centerY: number,
-    sweepFlag: number = 0
+    sweepFlag: number = 0,
   ) {
     const start = {
       x: centerX + radius * Math.cos(startAngle),
-      y: centerY + radius * Math.sin(startAngle)
+      y: centerY + radius * Math.sin(startAngle),
     }
     const end = {
       x: centerX + radius * Math.cos(endAngle),
-      y: centerY + radius * Math.sin(endAngle)
+      y: centerY + radius * Math.sin(endAngle),
     }
 
-    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1"
 
-    return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`;
+    return `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} ${sweepFlag} ${end.x} ${end.y}`
   }
 
   const startAngle = Math.acos(STRAIGHT_X / RADIUS_3PT)
@@ -69,21 +68,21 @@ function BasketballCourt({
     0,
     Math.PI,
     0,
-    COURT_Y - FT_CIRCLE_DIST
-  );
+    COURT_Y - FT_CIRCLE_DIST,
+  )
 
   const ftCircleBottom = generateArc(
     FT_CIRCLE_RADIUS,
     Math.PI,
     2 * Math.PI,
     0,
-    COURT_Y - FT_CIRCLE_DIST
-  );
+    COURT_Y - FT_CIRCLE_DIST,
+  )
 
   return (
     <svg
       viewBox={`${-25 * SCALE} 0 ${COURT_X} ${COURT_Y}`}
-      className="w-full h-full"
+      className="h-full w-full"
     >
       <line
         x1={-25 * SCALE}
@@ -120,12 +119,7 @@ function BasketballCourt({
         strokeWidth="0.5"
       /> */}
       {/* Three point line */}
-      <path
-        d={threePointArc}
-        fill="none"
-        stroke="blue"
-        strokeWidth="0.1"
-      />
+      <path d={threePointArc} fill="none" stroke="blue" strokeWidth="0.1" />
       <line
         x1={-STRAIGHT_X}
         y1={COURT_Y}
@@ -243,12 +237,7 @@ function BasketballCourt({
       />
 
       {/* Free throw circle */}
-      <path
-        d={ftCircleTop}
-        fill="none"
-        stroke="blue"
-        strokeWidth="0.1"
-      />
+      <path d={ftCircleTop} fill="none" stroke="blue" strokeWidth="0.1" />
       <path
         d={ftCircleBottom}
         fill="none"
@@ -258,21 +247,23 @@ function BasketballCourt({
       />
 
       {shots.map((shot, index) => {
-        if ((!shot.shotMade && !showMissedShots) || (shot.shotMade && !showMadeShots)) {
-          return null;
+        if (
+          (!shot.shotMade && !showMissedShots) ||
+          (shot.shotMade && !showMadeShots)
+        ) {
+          return null
         }
         return (
           <circle
             key={index}
             cx={shot.locX * SCALE}
-            cy={(COURT_Y - shot.locY * SCALE)}
+            cy={COURT_Y - shot.locY * SCALE}
             r={shotRadius}
             fill={shot.shotMade ? "green" : "red"}
             opacity={0.5}
           />
-        );
+        )
       })}
-
     </svg>
   )
 }

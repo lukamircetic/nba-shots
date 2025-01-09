@@ -6,7 +6,7 @@ import { ArrowUpDown } from "lucide-react"
 export interface Team {
   id: string
   name: string
-  abbreviation: string,
+  abbreviation: string
 }
 
 export const teamColumns: ColumnDef<Team>[] = [
@@ -45,9 +45,7 @@ export const teamColumns: ColumnDef<Team>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("name")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   // {
   //   accessorKey: "position",

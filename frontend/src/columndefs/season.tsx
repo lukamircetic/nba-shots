@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
 
 export interface Season {
-  id: string,
-  season_years: string,
+  id: string
+  season_years: string
 }
 
 export const seasonColumns: ColumnDef<Season>[] = [
@@ -44,9 +44,7 @@ export const seasonColumns: ColumnDef<Season>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("id")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   // {
   //   accessorKey: "position",

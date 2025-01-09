@@ -45,9 +45,7 @@ export const playerColumns: ColumnDef<Player>[] = [
         </Button>
       )
     },
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("name")}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   // {
   //   accessorKey: "position",

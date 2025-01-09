@@ -25,12 +25,12 @@ import {
 } from "@/components/ui/table"
 
 export interface HasId {
-  id: string;
+  id: string
 }
 
 interface DataTableProps<TData extends HasId, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[],
+  data: TData[]
   rowSelection: Record<string, boolean>
   setRowSelection: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
 }
@@ -43,7 +43,7 @@ export function DataTable<TData extends HasId, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
+    [],
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -82,9 +82,9 @@ export function DataTable<TData extends HasId, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   )
                 })}
@@ -99,10 +99,13 @@ export function DataTable<TData extends HasId, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={cell.column.id === 'select' ? 'w-12' : 'w-64'}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.id === "select" ? "w-12" : "w-64"}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}

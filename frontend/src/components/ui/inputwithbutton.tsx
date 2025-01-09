@@ -10,14 +10,16 @@ interface InputWithButtonProps {
 export function InputWithButton({ value, setValue }: InputWithButtonProps) {
   const [inputValue, setInputValue] = React.useState(value)
   return (
-    <div className="flex w-full max-w-sm items-center space-x-2 mt-1">
+    <div className="mt-1 flex w-full max-w-sm items-center space-x-2">
       <Input
         type="search"
         placeholder="Player Name"
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
       />
-      <Button type="submit" onClick={() => setValue(inputValue)}>Search</Button>
+      <Button type="submit" onClick={() => setValue(inputValue)}>
+        Search
+      </Button>
     </div>
   )
 }
