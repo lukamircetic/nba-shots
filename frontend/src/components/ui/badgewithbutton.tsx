@@ -17,7 +17,7 @@ export function BadgeWithButton({
       <Button
         type="button"
         variant="outline"
-        className="min-w-full justify-start [&_svg]:size-5"
+        className="min-w-full justify-start font-normal"
         onClick={() => handleClick(id)}
       >
         <Plus />

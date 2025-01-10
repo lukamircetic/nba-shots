@@ -23,30 +23,36 @@ import { BadgeWithButton } from "../ui/badgewithbutton"
 import { ScrollArea } from "../ui/scroll-area"
 import { DestructiveButton } from "../ui/destructivebutton"
 
-interface IdName {
+interface Player {
   id: string
   name: string
 }
 
+interface Team {
+  id: string
+  name: string
+  abbreviation: string
+}
+
+interface Season {
+  id: string
+  season_years: string
+}
+
 function Home() {
-  const [selectedPlayers, setSelectedPlayers] = React.useState<IdName[]>([])
-  const [teamSelection, setTeamSelection] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [seasonSelection, setSeasonSelection] = React.useState<
-    Record<string, boolean>
-  >({})
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-
-  const [filteredPlayersMap, _] = React.useState<Map<string, string>>(
-    new Map<string, string>(),
-  )
-
-  const handleGenShots = () => {
-    if (!isShotsFetching) {
-      refetch()
-    }
-  }
+  const [selectedPlayers, setSelectedPlayers] = React.useState<Player[]>([])
+  const [selectedTeams, setSelectedTeams] = React.useState<Team[]>([])
+  const [selectedSeasons2, setSelectedSeasons2] = React.useState<Season[]>([])
+  const [filteredPlayersMap, setFilteredPlayersMap] = React.useState<
+    Map<string, string>
+  >(new Map<string, string>())
+  const [filteredTeamsMap, setFilteredTeamsMap] = React.useState<
+    Map<string, string>
+  >(new Map<string, string>())
+  const [filteredSeasonsMap, setFilteredSeasonsMap] = React.useState<
+    Map<string, string>
+  >(new Map<string, string>())
 
   // Queries for filter fields
   const {
@@ -86,12 +92,12 @@ function Home() {
   const searchedPlayers = React.useMemo(() => {
     return playerData?.filter((player) => !filteredPlayersMap.has(player.id))
   }, [selectedPlayers, playerData])
-  const selectedTeams = React.useMemo(() => {
-    return teamData?.filter((team) => teamSelection[team.id])
-  }, [teamSelection, teamData])
-  const selectedSeasons = React.useMemo(() => {
-    return seasonData?.filter((season) => seasonSelection[season.id])
-  }, [seasonSelection, seasonData])
+  const searchedTeams = React.useMemo(() => {
+    return teamData?.filter((team) => !filteredTeamsMap.has(team.id))
+  }, [selectedTeams, teamData])
+  const searchedSeasons = React.useMemo(() => {
+    return seasonData?.filter((season) => !filteredSeasonsMap.has(season.id))
+  }, [selectedSeasons2, seasonData])
 
   const {
     isPending: isShotsPending,
@@ -101,13 +107,26 @@ function Home() {
     error: shotsError,
     refetch,
   } = useQuery({
-    queryKey: [selectedPlayers, selectedTeams, selectedSeasons],
+    queryKey: [selectedPlayers, selectedTeams, searchedSeasons],
     queryFn: ({ queryKey }) => {
       const [p, t, s] = queryKey
       return fetchShotsWithFilters(p, t, s)
     },
     enabled: false,
   })
+
+  const handleGenShots = () => {
+    if (!isShotsFetching) {
+      refetch()
+    }
+  }
+
+  const handleSelectAllPlayers = () => {
+    if (!searchedPlayers) return
+    for (const p of searchedPlayers) {
+      handlePlayerSelection(p.id)
+    }
+  }
 
   const handlePlayerSelection = (id: string) => {
     if (filteredPlayersMap.has(id)) {
@@ -133,6 +152,72 @@ function Home() {
     })
 
     filteredPlayersMap.delete(id)
+  }
+
+  const handleSelectAllTeams = () => {
+    if (!searchedTeams) return
+    for (const t of searchedTeams) {
+      handleTeamSelection(t.id)
+    }
+  }
+
+  const handleTeamSelection = (id: string) => {
+    if (filteredTeamsMap.has(id)) {
+      return
+    }
+
+    const team = teamData?.find((team) => team.id == id)
+    if (!team) return
+
+    setSelectedTeams((prevSelected) => {
+      return [...prevSelected, team]
+    })
+
+    filteredTeamsMap.set(id, team.name)
+  }
+
+  const handleTeamRemoval = (id: string) => {
+    if (!filteredTeamsMap.has(id)) {
+      return
+    }
+    setSelectedTeams((prevSelected) => {
+      return prevSelected.filter((p) => p.id !== id)
+    })
+
+    filteredTeamsMap.delete(id)
+  }
+
+  const handleSelectAllSeasons = () => {
+    if (!searchedSeasons) return
+    for (const t of searchedSeasons) {
+      handleSeasonSelection(t.id)
+    }
+  }
+
+  const handleSeasonSelection = (id: string) => {
+    if (filteredSeasonsMap.has(id)) {
+      return
+    }
+
+    const season = seasonData?.find((season) => season.id == id)
+    if (!season) return
+
+    setSelectedSeasons2((prevSelected) => {
+      return [...prevSelected, season]
+    })
+
+    filteredSeasonsMap.set(id, season.season_years)
+  }
+
+  const handleSeasonRemoval = (id: string) => {
+    if (!filteredSeasonsMap.has(id)) {
+      return
+    }
+    setSelectedSeasons2((prevSelected) => {
+      return prevSelected.filter((p) => p.id !== id)
+    })
+
+    filteredSeasonsMap.delete(id)
   }
 
   return (
@@ -164,19 +249,30 @@ function Home() {
                     <div>{`Error fetching players: ${playerError.message}`}</div>
                   )}
                   {searchedPlayers && (
-                    <ScrollArea className="h-72">
-                      <ul>
-                        {searchedPlayers.map((player, key) => (
-                          <li key={key}>
-                            <BadgeWithButton
-                              id={player.id}
-                              value={player.name}
-                              handleClick={handlePlayerSelection}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </ScrollArea>
+                    <div className="space-y-2">
+                      <ScrollArea className="h-72">
+                        <ul>
+                          {searchedPlayers.map((player, key) => (
+                            <li key={key}>
+                              <BadgeWithButton
+                                id={player.id}
+                                value={player.name}
+                                handleClick={handlePlayerSelection}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </ScrollArea>
+                      <Button
+                        variant="default"
+                        disabled={
+                          !searchedPlayers || searchedPlayers.length == 0
+                        }
+                        onClick={() => handleSelectAllPlayers()}
+                      >
+                        Select All
+                      </Button>
+                    </div>
                   )}
                 </div>
               </AccordionContent>
@@ -189,13 +285,29 @@ function Home() {
                   {isTeamError && (
                     <div>{`Error fetching teams: ${teamError.message}`}</div>
                   )}
-                  {teamData && (
-                    <DataTable
-                      data={teamData}
-                      columns={teamColumns}
-                      rowSelection={teamSelection}
-                      setRowSelection={setTeamSelection}
-                    />
+                  {searchedTeams && (
+                    <div className="space-y-2">
+                      <ScrollArea className="h-72">
+                        <ul>
+                          {searchedTeams.map((team, key) => (
+                            <li key={key}>
+                              <BadgeWithButton
+                                id={team.id}
+                                value={team.name}
+                                handleClick={handleTeamSelection}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </ScrollArea>
+                      <Button
+                        variant="default"
+                        disabled={!searchedTeams || searchedTeams.length == 0}
+                        onClick={() => handleSelectAllTeams()}
+                      >
+                        Select All
+                      </Button>
+                    </div>
                   )}
                 </div>
               </AccordionContent>
@@ -208,13 +320,31 @@ function Home() {
                   {isSeasonError && (
                     <div>{`Error fetching seasons: ${seasonError.message}`}</div>
                   )}
-                  {seasonData && (
-                    <DataTable
-                      data={seasonData}
-                      columns={seasonColumns}
-                      rowSelection={seasonSelection}
-                      setRowSelection={setSeasonSelection}
-                    />
+                  {searchedSeasons && (
+                    <div className="space-y-2">
+                      <ScrollArea className="h-72">
+                        <ul>
+                          {searchedSeasons.map((season, key) => (
+                            <li key={key}>
+                              <BadgeWithButton
+                                id={season.id}
+                                value={season.season_years}
+                                handleClick={handleSeasonSelection}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </ScrollArea>
+                      <Button
+                        variant="default"
+                        disabled={
+                          !searchedSeasons || searchedSeasons.length == 0
+                        }
+                        onClick={() => handleSelectAllSeasons()}
+                      >
+                        Select All
+                      </Button>
+                    </div>
                   )}
                 </div>
               </AccordionContent>
@@ -240,23 +370,21 @@ function Home() {
               {selectedTeams &&
                 selectedTeams.map((team, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {team.name}
-                    </Badge>
+                    <DestructiveButton
+                      id={team.id}
+                      value={team.name}
+                      handleClick={handleTeamRemoval}
+                    />
                   </li>
                 ))}
-              {selectedSeasons &&
-                selectedSeasons.map((season, key) => (
+              {selectedSeasons2 &&
+                selectedSeasons2.map((season, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {season.id}
-                    </Badge>
+                    <DestructiveButton
+                      id={season.id}
+                      value={season.season_years}
+                      handleClick={handleSeasonRemoval}
+                    />
                   </li>
                 ))}
             </ul>
