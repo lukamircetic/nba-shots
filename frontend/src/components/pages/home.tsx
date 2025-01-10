@@ -18,6 +18,7 @@ import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
+import { Pickaxe } from "lucide-react"
 
 function Home() {
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
@@ -250,8 +251,17 @@ function Home() {
             </ul>
           </div>
           <div>
-            <Button variant="default" onClick={handleGenShots}>
-              Generate Shot Chart
+            <Button
+              disabled={
+                selectedPlayers?.length === 0 &&
+                selectedTeams?.length === 0 &&
+                selectedSeasons?.length === 0
+              }
+              variant="default"
+              onClick={handleGenShots}
+              className="min-w-60 py-6"
+            >
+              <Pickaxe /> Generate Shot Chart
             </Button>
           </div>
         </div>
