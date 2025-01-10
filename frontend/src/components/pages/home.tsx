@@ -62,6 +62,7 @@ function Home() {
     handleSelectAll: handleSelectAllPlayers,
     handleSelect: handlePlayerSelection,
     handleRemove: handlePlayerRemoval,
+    handleRemoveAll: handleRemoveAllPlayers,
   } = useFilterManagement({ data: playerData })
 
   const {
@@ -70,6 +71,7 @@ function Home() {
     handleSelectAll: handleSelectAllTeams,
     handleSelect: handleTeamSelection,
     handleRemove: handleTeamRemoval,
+    handleRemoveAll: handleRemoveAllTeams,
   } = useFilterManagement({ data: teamData })
 
   const {
@@ -78,6 +80,7 @@ function Home() {
     handleSelectAll: handleSelectAllSeasons,
     handleSelect: handleSeasonSelection,
     handleRemove: handleSeasonRemoval,
+    handleRemoveAll: handleRemoveAllSeasons,
   } = useFilterManagement({ data: seasonData, nameKey: "season_years" })
 
   const {
@@ -179,6 +182,8 @@ function Home() {
           <div>
             <ul className="space-y-1">
               {selectedPlayers &&
+                (searchedPlayers?.length !== 0 ||
+                  selectedPlayers.length <= 5) &&
                 selectedPlayers.map((player, key) => (
                   <li key={key}>
                     <DestructiveButton
@@ -188,7 +193,20 @@ function Home() {
                     />
                   </li>
                 ))}
+              {/* basically if you select all, and theres more than 5 players it shows a summary of the search key instead of all the players */}
+              {selectedPlayers &&
+                selectedPlayers.length > 5 &&
+                searchedPlayers?.length === 0 && (
+                  <li>
+                    <DestructiveButton
+                      id=""
+                      value={`%${playerSearchKey}% (${selectedPlayers.length} players)`}
+                      handleClick={handleRemoveAllPlayers}
+                    />
+                  </li>
+                )}
               {selectedTeams &&
+                searchedTeams?.length !== 0 &&
                 selectedTeams.map((team, key) => (
                   <li key={key}>
                     <DestructiveButton
@@ -198,7 +216,17 @@ function Home() {
                     />
                   </li>
                 ))}
+              {selectedTeams && searchedTeams?.length === 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`All Teams`}
+                    handleClick={handleRemoveAllTeams}
+                  />
+                </li>
+              )}
               {selectedSeasons &&
+                searchedSeasons?.length !== 0 &&
                 selectedSeasons.map((season, key) => (
                   <li key={key}>
                     <DestructiveButton
@@ -208,6 +236,17 @@ function Home() {
                     />
                   </li>
                 ))}
+              {selectedSeasons &&
+                selectedSeasons.length > 0 &&
+                searchedSeasons?.length === 0 && (
+                  <li>
+                    <DestructiveButton
+                      id=""
+                      value="2003-2024" // TODO: make this dynamic in V2
+                      handleClick={handleRemoveAllSeasons}
+                    />
+                  </li>
+                )}
             </ul>
           </div>
           <div>

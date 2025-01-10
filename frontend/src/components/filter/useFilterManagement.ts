@@ -50,11 +50,17 @@ export function useFilterManagement<T extends FilterItem>({
       filteredMap.delete(id)
     }
 
+    const handleRemoveAll = (_: string) => {
+      setSelectedItems([])
+      filteredMap.clear()
+    }
+
     return {
       selectedItems,
       searchedItems,
       handleSelectAll,
       handleSelect,
-      handleRemove
+      handleRemove,
+      handleRemoveAll
     }
 }

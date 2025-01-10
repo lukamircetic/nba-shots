@@ -26,28 +26,30 @@ export function FilterSection<T extends FilterItem>({
 }: FilterSectionProps<T>) {
   if (isLoading) return <div>Loading...</div>
   if (isError) return <div>{`Error fetching ${title}: ${error?.message}`}</div>
-  return (
-    <div className="space-y-2">
-      <ScrollArea className="h-72">
-        <ul>
-          {items?.map((item, key) => (
-            <li key={key}>
-              <BadgeWithButton
-                id={item.id}
-                value={item[nameKey] as string}
-                handleClick={onSelect}
-              />
-            </li>
-          ))}
-        </ul>
-      </ScrollArea>
-      <Button
-        variant="default"
-        disabled={!items || items.length == 0}
-        onClick={() => onSelectAll()}
-      >
-        Select All
-      </Button>
-    </div>
-  )
+  if (items && items.length > 0) {
+    return (
+      <div className="space-y-2">
+        <ScrollArea className="h-72">
+          <ul>
+            {items?.map((item, key) => (
+              <li key={key}>
+                <BadgeWithButton
+                  id={item.id}
+                  value={item[nameKey] as string}
+                  handleClick={onSelect}
+                />
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+        <Button
+          variant="default"
+          disabled={!items || items.length == 0}
+          onClick={() => onSelectAll()}
+        >
+          Select All
+        </Button>
+      </div>
+    )
+  }
 }
