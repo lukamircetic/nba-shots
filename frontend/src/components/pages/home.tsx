@@ -6,7 +6,6 @@ import {
 } from "../ui/accordion"
 import { InputWithButton } from "../ui/inputwithbutton"
 import { DataTable } from "../ui/data-table"
-import { playerColumns } from "../../columndefs/player"
 import { teamColumns } from "../../columndefs/team"
 import { seasonColumns } from "../../columndefs/season"
 import React from "react"
@@ -20,11 +19,17 @@ import {
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
 import BasketballCourt from "../viz/basketball-court"
+import { BadgeWithButton } from "../ui/badgewithbutton"
+import { ScrollArea } from "../ui/scroll-area"
+import { DestructiveButton } from "../ui/destructivebutton"
+
+interface IdName {
+  id: string
+  name: string
+}
 
 function Home() {
-  const [playerSelection, setPlayerSelection] = React.useState<
-    Record<string, boolean>
-  >({})
+  const [selectedPlayers, setSelectedPlayers] = React.useState<IdName[]>([])
   const [teamSelection, setTeamSelection] = React.useState<
     Record<string, boolean>
   >({})
@@ -32,6 +37,10 @@ function Home() {
     Record<string, boolean>
   >({})
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
+
+  const [filteredPlayersMap, _] = React.useState<Map<string, string>>(
+    new Map<string, string>(),
+  )
 
   const handleGenShots = () => {
     if (!isShotsFetching) {
@@ -74,9 +83,9 @@ function Home() {
     queryFn: () => fetchAllSeasons(),
   })
 
-  const selectedPlayers = React.useMemo(() => {
-    return playerData?.filter((player) => playerSelection[player.id])
-  }, [playerSelection, playerData])
+  const searchedPlayers = React.useMemo(() => {
+    return playerData?.filter((player) => !filteredPlayersMap.has(player.id))
+  }, [selectedPlayers, playerData])
   const selectedTeams = React.useMemo(() => {
     return teamData?.filter((team) => teamSelection[team.id])
   }, [teamSelection, teamData])
@@ -100,6 +109,32 @@ function Home() {
     enabled: false,
   })
 
+  const handlePlayerSelection = (id: string) => {
+    if (filteredPlayersMap.has(id)) {
+      return
+    }
+
+    const player = playerData?.find((player) => player.id == id)
+    if (!player) return
+
+    setSelectedPlayers((prevSelected) => {
+      return [...prevSelected, player]
+    })
+
+    filteredPlayersMap.set(id, player.name)
+  }
+
+  const handlePlayerRemoval = (id: string) => {
+    if (!filteredPlayersMap.has(id)) {
+      return
+    }
+    setSelectedPlayers((prevSelected) => {
+      return prevSelected.filter((p) => p.id !== id)
+    })
+
+    filteredPlayersMap.delete(id)
+  }
+
   return (
     <div className="relative flex min-h-svh flex-col bg-background px-14">
       <div className="flex w-full flex-col items-start justify-items-start space-y-2 py-16">
@@ -119,7 +154,7 @@ function Home() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Players</AccordionTrigger>
               <AccordionContent>
-                <div className="ml-[1px] max-w-sm space-y-4">
+                <div className="ml-[1px] max-w-xs space-y-4">
                   <InputWithButton
                     value={playerSearchKey}
                     setValue={setPlayerSearchKey}
@@ -128,13 +163,20 @@ function Home() {
                   {isPlayerError && (
                     <div>{`Error fetching players: ${playerError.message}`}</div>
                   )}
-                  {playerData && (
-                    <DataTable
-                      data={playerData}
-                      columns={playerColumns}
-                      rowSelection={playerSelection}
-                      setRowSelection={setPlayerSelection}
-                    />
+                  {searchedPlayers && (
+                    <ScrollArea className="h-72">
+                      <ul>
+                        {searchedPlayers.map((player, key) => (
+                          <li key={key}>
+                            <BadgeWithButton
+                              id={player.id}
+                              value={player.name}
+                              handleClick={handlePlayerSelection}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </ScrollArea>
                   )}
                 </div>
               </AccordionContent>
@@ -188,12 +230,11 @@ function Home() {
               {selectedPlayers &&
                 selectedPlayers.map((player, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {player.name}
-                    </Badge>
+                    <DestructiveButton
+                      id={player.id}
+                      value={player.name}
+                      handleClick={handlePlayerRemoval}
+                    />
                   </li>
                 ))}
               {selectedTeams &&
