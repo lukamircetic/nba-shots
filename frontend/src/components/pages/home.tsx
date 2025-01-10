@@ -15,8 +15,6 @@ import {
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
 import BasketballCourt from "../viz/basketball-court"
-import { BadgeWithButton } from "../ui/badgewithbutton"
-import { ScrollArea } from "../ui/scroll-area"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
@@ -24,7 +22,6 @@ import { FilterSection } from "../filter/FilterSection"
 function Home() {
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
 
-  // Queries for filter fields
   const {
     isPending: isPlayerPending,
     isError: isPlayerError,

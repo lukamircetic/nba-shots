@@ -13,7 +13,7 @@ interface BasketballCourtProps {
 
 function BasketballCourt({
   shots = [],
-  shotRadius = 0.3,
+  shotRadius = 0.4,
   showMadeShots = true,
   showMissedShots = true,
 }: BasketballCourtProps) {
@@ -31,7 +31,7 @@ function BasketballCourt({
   const FT_CIRCLE_DIST = 19 * SCALE
   const COURT_Y = 50 * SCALE
   const COURT_X = 50 * SCALE
-
+  const lineClassName = "stroke-primary"
   function generateArc(
     radius: number,
     startAngle: number,
@@ -85,11 +85,12 @@ function BasketballCourt({
       className="h-full w-full"
     >
       <line
+        className={lineClassName}
         x1={-25 * SCALE}
         y1={COURT_Y}
         x2={25 * SCALE}
         y2={COURT_Y}
-        stroke="black"
+        stroke="red"
         strokeWidth="0.25"
       />
       {/* full court lines if i ever need them */}
@@ -99,7 +100,7 @@ function BasketballCourt({
         y1={0}
         x2={25 * SCALE}
         y2={0}
-        stroke="black"
+        stroke="red"
         strokeWidth="0.5"
       />
       <line
@@ -107,7 +108,7 @@ function BasketballCourt({
         y1={0}
         x2={25 * SCALE}
         y2={COURT_Y}
-        stroke="black"
+        stroke="red"
         strokeWidth="0.5"
       />
       <line
@@ -115,51 +116,62 @@ function BasketballCourt({
         y1={0}
         x2={-25 * SCALE}
         y2={COURT_Y}
-        stroke="black"
+        stroke="red"
         strokeWidth="0.5"
       /> */}
       {/* Three point line */}
-      <path d={threePointArc} fill="none" stroke="blue" strokeWidth="0.1" />
+      <path
+        d={threePointArc}
+        className={lineClassName}
+        fill="none"
+        stroke="red"
+        strokeWidth="0.1"
+      />
       <line
+        className={lineClassName}
         x1={-STRAIGHT_X}
         y1={COURT_Y}
         x2={-STRAIGHT_X}
         y2={COURT_Y - STRAIGHT_Y}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
       <line
+        className={lineClassName}
         x1={STRAIGHT_X}
         y1={COURT_Y}
         x2={STRAIGHT_X}
         y2={COURT_Y - STRAIGHT_Y}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
 
       {/* Key box */}
       <line
+        className={lineClassName}
         x1={-KEY_WIDTH}
         y1={COURT_Y}
         x2={-KEY_WIDTH}
         y2={COURT_Y - FT_LINE_Y}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
       <line
+        className={lineClassName}
         x1={KEY_WIDTH}
         y1={COURT_Y}
         x2={KEY_WIDTH}
         y2={COURT_Y - FT_LINE_Y}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
       <line
+        className={lineClassName}
         x1={-KEY_WIDTH}
         y1={COURT_Y - FT_LINE_Y}
         x2={KEY_WIDTH}
         y2={COURT_Y - FT_LINE_Y}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
 
@@ -212,36 +224,45 @@ function BasketballCourt({
         y1={COURT_Y - COURT_Y / 2}
         x2={COURT_X}
         y2={COURT_Y - COURT_Y / 2}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       /> */}
 
       {/* Basket */}
       <line
+        className={lineClassName}
         x1={-BASKET_WIDTH}
         y1={COURT_Y - BB_DIST}
         x2={BASKET_WIDTH}
         y2={COURT_Y - BB_DIST}
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
 
       {/* Hoop */}
       <circle
+        className={lineClassName}
         cx={0}
         cy={COURT_Y - BASKET_DIST}
         r={BASKET_RADIUS}
         fill="none"
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
       />
 
       {/* Free throw circle */}
-      <path d={ftCircleTop} fill="none" stroke="blue" strokeWidth="0.1" />
       <path
+        d={ftCircleTop}
+        className={lineClassName}
+        fill="none"
+        stroke="red"
+        strokeWidth="0.1"
+      />
+      <path
+        className={lineClassName}
         d={ftCircleBottom}
         fill="none"
-        stroke="blue"
+        stroke="red"
         strokeWidth="0.1"
         strokeDasharray="2,2"
       />
