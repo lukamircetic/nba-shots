@@ -31,7 +31,7 @@ function Home() {
     queryKey: ["players", playerSearchKey],
     queryFn: ({ queryKey }) => {
       const [, name] = queryKey
-      if (name == "") return [] // probably a better way to do this
+      if (name == "") return [] // don't allow all players search for now
       return fetchPlayersByName(name)
     },
   })
