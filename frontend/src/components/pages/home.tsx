@@ -5,12 +5,7 @@ import {
   AccordionTrigger,
 } from "../ui/accordion"
 import { InputWithButton } from "../ui/inputwithbutton"
-import { DataTable } from "../ui/data-table"
-import { playerColumns } from "../../columndefs/player"
-import { teamColumns } from "../../columndefs/team"
-import { seasonColumns } from "../../columndefs/season"
 import React from "react"
-import { Badge } from "../ui/badge"
 import { Button } from "../ui/button"
 import {
   fetchAllSeasons,
@@ -20,24 +15,14 @@ import {
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
 import BasketballCourt from "../viz/basketball-court"
+import { BadgeWithButton } from "../ui/badgewithbutton"
+import { ScrollArea } from "../ui/scroll-area"
+import { DestructiveButton } from "../ui/destructivebutton"
+import { useFilterManagement } from "../filter/useFilterManagement"
+import { FilterSection } from "../filter/FilterSection"
 
 function Home() {
-  const [playerSelection, setPlayerSelection] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [teamSelection, setTeamSelection] = React.useState<
-    Record<string, boolean>
-  >({})
-  const [seasonSelection, setSeasonSelection] = React.useState<
-    Record<string, boolean>
-  >({})
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-
-  const handleGenShots = () => {
-    if (!isShotsFetching) {
-      refetch()
-    }
-  }
 
   // Queries for filter fields
   const {
@@ -74,18 +59,31 @@ function Home() {
     queryFn: () => fetchAllSeasons(),
   })
 
-  const selectedPlayers = React.useMemo(() => {
-    return playerData?.filter((player) => playerSelection[player.id])
-  }, [playerSelection, playerData])
-  const selectedTeams = React.useMemo(() => {
-    return teamData?.filter((team) => teamSelection[team.id])
-  }, [teamSelection, teamData])
-  const selectedSeasons = React.useMemo(() => {
-    return seasonData?.filter((season) => seasonSelection[season.id])
-  }, [seasonSelection, seasonData])
+  const {
+    selectedItems: selectedPlayers,
+    searchedItems: searchedPlayers,
+    handleSelectAll: handleSelectAllPlayers,
+    handleSelect: handlePlayerSelection,
+    handleRemove: handlePlayerRemoval,
+  } = useFilterManagement({ data: playerData })
 
   const {
-    isPending: isShotsPending,
+    selectedItems: selectedTeams,
+    searchedItems: searchedTeams,
+    handleSelectAll: handleSelectAllTeams,
+    handleSelect: handleTeamSelection,
+    handleRemove: handleTeamRemoval,
+  } = useFilterManagement({ data: teamData })
+
+  const {
+    selectedItems: selectedSeasons,
+    searchedItems: searchedSeasons,
+    handleSelectAll: handleSelectAllSeasons,
+    handleSelect: handleSeasonSelection,
+    handleRemove: handleSeasonRemoval,
+  } = useFilterManagement({ data: seasonData, nameKey: "season_years" })
+
+  const {
     isFetching: isShotsFetching,
     isError: isShotsError,
     data: shotsData,
@@ -99,6 +97,12 @@ function Home() {
     },
     enabled: false,
   })
+
+  const handleGenShots = () => {
+    if (!isShotsFetching) {
+      refetch()
+    }
+  }
 
   return (
     <div className="relative flex min-h-svh flex-col bg-background px-14">
@@ -119,23 +123,20 @@ function Home() {
             <AccordionItem value="item-1">
               <AccordionTrigger>Players</AccordionTrigger>
               <AccordionContent>
-                <div className="ml-[1px] max-w-sm space-y-4">
+                <div className="ml-[1px] max-w-xs space-y-4">
                   <InputWithButton
                     value={playerSearchKey}
                     setValue={setPlayerSearchKey}
                   />
-                  {isPlayerPending && <div>Loading...</div>}
-                  {isPlayerError && (
-                    <div>{`Error fetching players: ${playerError.message}`}</div>
-                  )}
-                  {playerData && (
-                    <DataTable
-                      data={playerData}
-                      columns={playerColumns}
-                      rowSelection={playerSelection}
-                      setRowSelection={setPlayerSelection}
-                    />
-                  )}
+                  <FilterSection
+                    title="Players"
+                    items={searchedPlayers}
+                    isLoading={isPlayerPending}
+                    isError={isPlayerError}
+                    error={isPlayerError ? playerError : null}
+                    onSelect={handlePlayerSelection}
+                    onSelectAll={handleSelectAllPlayers}
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -143,18 +144,15 @@ function Home() {
               <AccordionTrigger>Teams</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
-                  {isTeamPending && <div>Loading...</div>}
-                  {isTeamError && (
-                    <div>{`Error fetching teams: ${teamError.message}`}</div>
-                  )}
-                  {teamData && (
-                    <DataTable
-                      data={teamData}
-                      columns={teamColumns}
-                      rowSelection={teamSelection}
-                      setRowSelection={setTeamSelection}
-                    />
-                  )}
+                  <FilterSection
+                    title="Teams"
+                    items={searchedTeams}
+                    isLoading={isTeamPending}
+                    isError={isTeamError}
+                    error={isTeamError ? teamError : null}
+                    onSelect={handleTeamSelection}
+                    onSelectAll={handleSelectAllTeams}
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -162,24 +160,22 @@ function Home() {
               <AccordionTrigger>Seasons</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
-                  {isSeasonPending && <div>Loading...</div>}
-                  {isSeasonError && (
-                    <div>{`Error fetching seasons: ${seasonError.message}`}</div>
-                  )}
-                  {seasonData && (
-                    <DataTable
-                      data={seasonData}
-                      columns={seasonColumns}
-                      rowSelection={seasonSelection}
-                      setRowSelection={setSeasonSelection}
-                    />
-                  )}
+                  <FilterSection
+                    title="Seasons"
+                    items={searchedSeasons}
+                    isLoading={isSeasonPending}
+                    isError={isSeasonError}
+                    error={isSeasonError ? seasonError : null}
+                    onSelect={handleSeasonSelection}
+                    onSelectAll={handleSelectAllSeasons}
+                    nameKey="season_years"
+                  />
                 </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </div>
-        <div className="ml-12 flex w-1/5 flex-col">
+        <div className="ml-12 flex w-1/5 flex-col space-y-2">
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
             Selected Filters
           </h3>
@@ -188,40 +184,37 @@ function Home() {
               {selectedPlayers &&
                 selectedPlayers.map((player, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {player.name}
-                    </Badge>
+                    <DestructiveButton
+                      id={player.id}
+                      value={player.name}
+                      handleClick={handlePlayerRemoval}
+                    />
                   </li>
                 ))}
               {selectedTeams &&
                 selectedTeams.map((team, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {team.name}
-                    </Badge>
+                    <DestructiveButton
+                      id={team.id}
+                      value={team.name}
+                      handleClick={handleTeamRemoval}
+                    />
                   </li>
                 ))}
               {selectedSeasons &&
                 selectedSeasons.map((season, key) => (
                   <li key={key}>
-                    <Badge
-                      variant="default"
-                      className="min-w-36 justify-center p-2"
-                    >
-                      {season.id}
-                    </Badge>
+                    <DestructiveButton
+                      id={season.id}
+                      value={season.season_years}
+                      handleClick={handleSeasonRemoval}
+                    />
                   </li>
                 ))}
             </ul>
           </div>
           <div>
-            <Button variant="secondary" onClick={handleGenShots}>
+            <Button variant="default" onClick={handleGenShots}>
               Generate Shot Chart
             </Button>
           </div>
@@ -232,16 +225,15 @@ function Home() {
           </h3>
           <div className="h-[70lvh] w-full">
             <div className="p-4">
-              {isShotsPending && <div>Please run a query</div>}
               {isShotsFetching && <div>Loading...</div>}
               {isShotsError && (
                 <div>{`Error fetching shots: ${shotsError.message}`}</div>
               )}
-              {shotsData && (
+              {
                 <div className="">
                   <BasketballCourt shots={shotsData} />
                 </div>
-              )}
+              }
             </div>
           </div>
         </div>
