@@ -18,13 +18,16 @@ import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
-import { FileCode, Pickaxe, Save, Share } from "lucide-react"
+import { FileCode, Pickaxe, Save } from "lucide-react"
 import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 import { DialogShareButton } from "./sharedialog"
+import { saveSvgAsPng } from "@/api/saveimage"
+import { saveAsJSON } from "@/api/exportjson"
 
 function Home() {
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-  // const [shareDialog, setShareDialog] = React.useState<boolean>(false)
+  const svgRef = React.useRef<SVGSVGElement>(null)
+
   const {
     isPending: isPlayerPending,
     isError: isPlayerError,
@@ -104,6 +107,22 @@ function Home() {
   const handleGenShots = () => {
     if (!isShotsFetching) {
       refetch()
+    }
+  }
+
+  const handleSavePNG = async () => {
+    if (svgRef.current) {
+      try {
+        await saveSvgAsPng(svgRef.current)
+      } catch (error) {
+        console.error("Failed to save PNG", error)
+      }
+    }
+  }
+
+  const handleSaveData = () => {
+    if (shotsData) {
+      saveAsJSON(selectedPlayers, selectedTeams, selectedSeasons, shotsData)
     }
   }
 
@@ -273,10 +292,13 @@ function Home() {
               Shot Chart
             </h3>
             <DialogShareButton />
-            <ButtonWithTooltip text="Save as PNG">
+            <ButtonWithTooltip text="Save as PNG" onClick={handleSavePNG}>
               <Save />
             </ButtonWithTooltip>
-            <ButtonWithTooltip text="Save JSON shot data">
+            <ButtonWithTooltip
+              text="Save JSON shot data"
+              onClick={handleSaveData}
+            >
               <FileCode />
             </ButtonWithTooltip>
           </div>
@@ -288,7 +310,7 @@ function Home() {
               )}
               {
                 <div className="rounded-md border p-2">
-                  <BasketballCourt shots={shotsData} />
+                  <BasketballCourt ref={svgRef} shots={shotsData} />
                 </div>
               }
             </div>

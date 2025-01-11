@@ -7,6 +7,7 @@ import {
 } from "./tooltip"
 interface InputWithButtonProps {
   text: string
+  onClick?: () => void
   children: React.ReactNode
 }
 
