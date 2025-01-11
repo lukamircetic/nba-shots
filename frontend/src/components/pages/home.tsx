@@ -19,17 +19,12 @@ import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
 import { FileCode, Pickaxe, Save, Share } from "lucide-react"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip"
 import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
+import { DialogShareButton } from "./sharedialog"
 
 function Home() {
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-
+  // const [shareDialog, setShareDialog] = React.useState<boolean>(false)
   const {
     isPending: isPlayerPending,
     isError: isPlayerError,
@@ -277,9 +272,7 @@ function Home() {
             <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
               Shot Chart
             </h3>
-            <ButtonWithTooltip text="Share this chart">
-              <Share />
-            </ButtonWithTooltip>
+            <DialogShareButton />
             <ButtonWithTooltip text="Save as PNG">
               <Save />
             </ButtonWithTooltip>
