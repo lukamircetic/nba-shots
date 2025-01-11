@@ -1,4 +1,6 @@
-import { HasId } from "@/components/ui/data-table"
+interface HasId {
+  id: string
+}
 
 type PlayerResponse = {
   id: number,
@@ -24,7 +26,7 @@ type ShotResponse = {
   loc_x: number,
   loc_y: number,
   shot_made: boolean,
-  shot_type: number,
+  shot_type: string,
   elapsed: number,
 }
 

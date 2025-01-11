@@ -18,7 +18,14 @@ import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
-import { Pickaxe } from "lucide-react"
+import { FileCode, Pickaxe, Save, Share } from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip"
+import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 
 function Home() {
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
@@ -176,7 +183,7 @@ function Home() {
             </AccordionItem>
           </Accordion>
         </div>
-        <div className="ml-12 flex w-1/5 flex-col space-y-2">
+        <div className="ml-12 flex w-1/5 flex-col space-y-4">
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
             Selected Filters
           </h3>
@@ -265,18 +272,29 @@ function Home() {
             </Button>
           </div>
         </div>
-        <div className="flex-1">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-            Shot Chart
-          </h3>
+        <div className="flex-1 space-y-8">
+          <div className="flex items-center justify-end gap-1">
+            <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
+              Shot Chart
+            </h3>
+            <ButtonWithTooltip text="Share this chart">
+              <Share />
+            </ButtonWithTooltip>
+            <ButtonWithTooltip text="Save as PNG">
+              <Save />
+            </ButtonWithTooltip>
+            <ButtonWithTooltip text="Save JSON shot data">
+              <FileCode />
+            </ButtonWithTooltip>
+          </div>
           <div className="h-[70lvh] w-full">
-            <div className="p-4">
+            <div className="">
               {isShotsFetching && <div>Loading...</div>}
               {isShotsError && (
                 <div>{`Error fetching shots: ${shotsError.message}`}</div>
               )}
               {
-                <div className="">
+                <div className="rounded-md border p-2">
                   <BasketballCourt shots={shotsData} />
                 </div>
               }

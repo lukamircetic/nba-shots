@@ -94,31 +94,34 @@ function BasketballCourt({
         strokeWidth="0.25"
       />
       {/* full court lines if i ever need them */}
-      {/*
+
       <line
+        className={lineClassName}
         x1={-25 * SCALE}
         y1={0}
         x2={25 * SCALE}
         y2={0}
         stroke="red"
-        strokeWidth="0.5"
+        strokeWidth="0.25"
       />
       <line
+        className={lineClassName}
         x1={25 * SCALE}
         y1={0}
         x2={25 * SCALE}
         y2={COURT_Y}
         stroke="red"
-        strokeWidth="0.5"
+        strokeWidth="0.25"
       />
       <line
+        className={lineClassName}
         x1={-25 * SCALE}
         y1={0}
         x2={-25 * SCALE}
         y2={COURT_Y}
         stroke="red"
-        strokeWidth="0.5"
-      /> */}
+        strokeWidth="0.25"
+      />
       {/* Three point line */}
       <path
         d={threePointArc}
