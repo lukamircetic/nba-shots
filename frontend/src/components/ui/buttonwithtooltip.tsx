@@ -8,19 +8,21 @@ import {
 interface InputWithButtonProps {
   text: string
   onClick?: () => void
+  disabled?: boolean
   children: React.ReactNode
 }
 
 export function ButtonWithTooltip({
   text,
   children,
+  disabled,
   ...props
 }: InputWithButtonProps) {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant="outline" size="icon" {...props}>
+          <Button variant="outline" size="icon" {...props} disabled={disabled}>
             {children}
           </Button>
         </TooltipTrigger>

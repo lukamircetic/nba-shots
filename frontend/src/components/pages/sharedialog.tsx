@@ -16,7 +16,11 @@ import { Separator } from "../ui/separator"
 import { Twitter } from "../icons/twitter"
 import React from "react"
 
-export function DialogShareButton() {
+interface DialogShareButtonProps {
+  disabled?: boolean
+}
+
+export function DialogShareButton({ disabled }: DialogShareButtonProps) {
   const currentUrl = window.location.href
   const [copied, setCopied] = React.useState<boolean>(false)
 
@@ -32,7 +36,7 @@ export function DialogShareButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <ButtonWithTooltip text="Share this chart">
+        <ButtonWithTooltip text="Share this chart" disabled={disabled}>
           <Share />
         </ButtonWithTooltip>
       </DialogTrigger>

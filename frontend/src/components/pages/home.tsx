@@ -291,13 +291,18 @@ function Home() {
             <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
               Shot Chart
             </h3>
-            <DialogShareButton />
-            <ButtonWithTooltip text="Save as PNG" onClick={handleSavePNG}>
+            <DialogShareButton disabled={shotsData === undefined} />
+            <ButtonWithTooltip
+              text="Save as PNG"
+              onClick={handleSavePNG}
+              disabled={shotsData === undefined}
+            >
               <Save />
             </ButtonWithTooltip>
             <ButtonWithTooltip
               text="Save JSON shot data"
               onClick={handleSaveData}
+              disabled={shotsData === undefined}
             >
               <FileCode />
             </ButtonWithTooltip>
