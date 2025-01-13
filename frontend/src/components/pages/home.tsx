@@ -18,7 +18,7 @@ import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
-import { FileCode, Pickaxe, Save } from "lucide-react"
+import { FileCode, ImageDown, Pickaxe } from "lucide-react"
 import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 import { DialogShareButton } from "./sharedialog"
 import { saveSvgAsPng } from "@/api/saveimage"
@@ -297,7 +297,7 @@ function Home() {
               onClick={handleSavePNG}
               disabled={shotsData === undefined}
             >
-              <Save />
+              <ImageDown />
             </ButtonWithTooltip>
             <ButtonWithTooltip
               text="Save JSON shot data"

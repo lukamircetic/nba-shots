@@ -61,7 +61,7 @@ export function DialogShareButton({ disabled }: DialogShareButtonProps) {
         <div className="flex flex-col items-start space-y-2">
           <DialogDescription>Share to socials</DialogDescription>
           <div className="flex items-center justify-end gap-1">
-            <ButtonWithTooltip text="Share to X">
+            <ButtonWithTooltip variant="default" text="Share to X">
               <a
                 href={`https://twitter.com/share?url=${encodeURIComponent(currentUrl)}`}
                 target="_blank"
