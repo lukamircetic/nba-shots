@@ -97,9 +97,18 @@ type PlayerTeamSeason struct {
 }
 
 type RequestShotParams struct {
-	PlayerIDs   []int `json:"player_id"`
-	TeamIDs     []int `json:"team_id"`
-	SeasonYears []int `json:"season_year"`
+	PlayerIDs       []int     `json:"player_id"`
+	TeamIDs         []int     `json:"team_id"`
+	SeasonYears     []int     `json:"season_year"`
+	OpposingTeamIds []int     `json:"opposing_team_id"`
+	StartGameDate   time.Time `json:"start_game_date"`
+	EndGameDate     time.Time `json:"end_game_date"`
+	GameLocation    string    `json:"game_location"`
+	Quarters        []int     `json:"quarters"`
+	StartMinsLeft   int       `json:"start_mins_left"`
+	EndMinsLeft     int       `json:"end_mins_left"`
+	StartSecsLeft   int       `json:"start_secs_left"`
+	EndSecsLeft     int       `json:"end_secs_left"`
 }
 
 func NewRequestShotParams() *RequestShotParams {

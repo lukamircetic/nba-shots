@@ -6,6 +6,7 @@ import (
 	"nba-shots/internal/types"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/go-chi/render"
 )
@@ -104,6 +105,60 @@ func ShotCtx(next http.Handler) http.Handler {
 			}
 
 			shotArgs.SeasonYears = seasonIds
+		}
+
+		opposingTeamQueryParams := r.URL.Query().Get("opposing_team_id")
+		if opposingTeamQueryParams != "" {
+			log.Println("opposing team ids passed in", opposingTeamQueryParams)
+			opposingTeamStringIDs := strings.Split(opposingTeamQueryParams, ",")
+			opposingTeamIDs, err := ConvertStringSlicetoIntSlice(opposingTeamStringIDs)
+
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+
+			shotArgs.OpposingTeamIds = opposingTeamIDs
+		}
+
+		startGameDateParam := r.URL.Query().Get("start_game_date")
+		if startGameDateParam != "" {
+			log.Println("start game date", startGameDateParam)
+			startGameDate, err := time.Parse("01-02-2006", startGameDateParam)
+
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+
+			shotArgs.StartGameDate = startGameDate
+		}
+
+		endGameDateParam := r.URL.Query().Get("end_game_date")
+		if endGameDateParam != "" {
+			log.Println("end game date", endGameDateParam)
+			endGameDate, err := time.Parse("01-02-2006", endGameDateParam)
+
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+
+			shotArgs.EndGameDate = endGameDate
+		}
+
+		gameLocationParam := r.URL.Query().Get("game_location")
+		if gameLocationParam != "" {
+			log.Println("game location", gameLocationParam)
+			shotArgs.GameLocation = gameLocationParam
+		}
+
+		quartersParam := r.URL.Query().Get("quarter")
+		if quartersParam != "" {
+			log.Println("quarters", quartersParam)
+			quarterString := strings.Split(quartersParam, ",")
+			quarters, err := ConvertStringSlicetoIntSlice(quarterString)
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+			shotArgs.Quarters = quarters
 		}
 
 		log.Println("shotArgs", shotArgs)
