@@ -44,6 +44,20 @@ export async function fetchPlayersByName(name: string) {
   }))
 }
 
+export async function fetchPlayersByIds(playerIds: string) {
+  const response = await fetch(`http://localhost:8080/player/multi?player_id=${playerIds}`)
+  const data: PlayerResponse[] = await response.json()
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch players")
+  }
+
+  return data.map((player) => ({
+    id: player.id.toString(),
+    name: player.name,
+  }))
+}
+
 export async function fetchAllTeams() {
   const response = await fetch(`http://localhost:8080/team/all`)
   const data: TeamResponse[] = await response.json()

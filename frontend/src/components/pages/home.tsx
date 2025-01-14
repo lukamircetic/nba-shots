@@ -10,6 +10,7 @@ import { Button } from "../ui/button"
 import {
   fetchAllSeasons,
   fetchAllTeams,
+  fetchPlayersByIds,
   fetchPlayersByName,
   fetchShotsWithFilters,
 } from "@/api/queries"
@@ -27,7 +28,8 @@ import { useSearch } from "@tanstack/react-router"
 
 function Home() {
   const search = useSearch({ from: "/" })
-
+  const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
+  const initialLoad = React.useRef<boolean>(true)
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
   const svgRef = React.useRef<SVGSVGElement>(null)
 
@@ -101,7 +103,7 @@ function Home() {
     isError: isShotsError,
     data: shotsData,
     error: shotsError,
-    refetch,
+    refetch: refetchShots,
   } = useQuery({
     queryKey: [selectedPlayers, selectedTeams, selectedSeasons],
     queryFn: ({ queryKey }) => {
@@ -111,9 +113,34 @@ function Home() {
     enabled: false,
   })
 
+  // TODO: Show loading and error states for url param loading
+  const {
+    // isFetching: isParamPlayersFetching,
+    // isError: isParamPlayersError,
+    data: paramPlayersData,
+    // error: paramPlayersError,
+    // refetch: refetchParamPlayers,
+  } = useQuery({
+    queryKey: [search.players],
+    queryFn: ({ queryKey }) => {
+      const [playersString] = queryKey
+      if (playersString === undefined) return []
+      return fetchPlayersByIds(playersString)
+    },
+  })
+
+  const onGenShotsClick = () => {
+    setIsGenShots(true)
+  }
+
   const handleGenShots = () => {
-    if (!isShotsFetching) {
-      refetch()
+    if (
+      !isShotsFetching &&
+      (selectedPlayers.length > 0 ||
+        selectedTeams.length > 0 ||
+        selectedSeasons.length > 0)
+    ) {
+      refetchShots()
     }
   }
 
@@ -133,42 +160,46 @@ function Home() {
     }
   }
 
+  // TODO: This url param loading stuff is really messy, cleanup
   React.useEffect(() => {
-    if (teamData !== undefined || seasonData !== undefined) {
-      if (search.players !== undefined) {
-        // get validated players from url
-        console.log("Searched players", search.players)
-
-        // fetch players from db
-        console.log("fetched param players from the database")
-
-        // need a function for adding search params to selected
-        console.log("added search param players to selectedPlayers")
+    if (
+      initialLoad.current &&
+      (paramPlayersData !== undefined ||
+        teamData !== undefined ||
+        seasonData !== undefined)
+    ) {
+      initialLoad.current = false
+      if (search.players !== undefined && paramPlayersData !== undefined) {
+        for (const player of paramPlayersData) {
+          handlePlayerSelection(player.id, player)
+        }
       }
-      if (search.teams !== undefined) {
-        // get validated teams from url
-        console.log("Searched teams", search.teams)
-
-        // fetch teams from db
-        console.log("fetched param teams from the database")
-
-        // need a function for adding search params to selected
-        console.log("added search param teams to selectedTeams")
+      if (search.teams !== undefined && teamData !== undefined) {
+        for (const teamId of search.teams.split(",")) {
+          const team = teamData.find((team) => team.id === teamId)
+          if (team !== undefined) {
+            handleTeamSelection(team.id, team)
+          }
+        }
       }
-      if (search.seasons !== undefined) {
-        // get validated seasons from url
-        console.log("Searched seasons", search.seasons)
-
-        // fetch seasons from db
-        console.log("fetched param seasons from the database")
-
-        // need a function for adding search params to selected
-        console.log("added search param seasons to selectedSeasons")
+      if (search.seasons !== undefined && seasonData !== undefined) {
+        for (const seasonId of search.seasons.split(",")) {
+          const season = seasonData.find((s) => s.id === seasonId)
+          if (season !== undefined) {
+            handleSeasonSelection(season.id, season)
+          }
+        }
       }
-      // get shots with the initial search query
-      // handleGenShots()
+      setIsGenShots(true)
     }
-  }, [teamData, seasonData])
+  }, [paramPlayersData, teamData, seasonData])
+
+  React.useEffect(() => {
+    if (isGenShots) {
+      handleGenShots()
+      setIsGenShots(false)
+    }
+  }, [isGenShots])
 
   return (
     <div className="relative flex min-h-svh flex-col bg-background px-14">
@@ -323,7 +354,7 @@ function Home() {
                 selectedSeasons?.length === 0
               }
               variant="default"
-              onClick={handleGenShots}
+              onClick={onGenShotsClick}
               className="min-w-60 py-6"
             >
               <Pickaxe /> Generate Shot Chart
