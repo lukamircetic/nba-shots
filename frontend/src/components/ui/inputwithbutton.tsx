@@ -9,17 +9,26 @@ interface InputWithButtonProps {
 
 export function InputWithButton({ value, setValue }: InputWithButtonProps) {
   const [inputValue, setInputValue] = React.useState(value)
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setValue(inputValue)
+  }
+
   return (
-    <div className="mt-1 flex w-full max-w-sm items-center space-x-2">
+    <form
+      onSubmit={handleSubmit}
+      className="mt-1 flex w-full max-w-sm items-center space-x-2"
+    >
       <Input
         type="search"
         placeholder="Player Name"
         value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
+        onChange={(e) => {
+          setInputValue(e.target.value)
+        }}
       />
-      <Button type="submit" onClick={() => setValue(inputValue)}>
-        Search
-      </Button>
-    </div>
+      <Button type="submit">Search</Button>
+    </form>
   )
 }
