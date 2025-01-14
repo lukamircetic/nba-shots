@@ -23,8 +23,11 @@ import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 import { DialogShareButton } from "./sharedialog"
 import { saveSvgAsPng } from "@/api/saveimage"
 import { saveAsJSON } from "@/api/exportjson"
+import { useSearch } from "@tanstack/react-router"
 
 function Home() {
+  const search = useSearch({ from: "/" })
+
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
   const svgRef = React.useRef<SVGSVGElement>(null)
 
@@ -69,7 +72,7 @@ function Home() {
     handleSelect: handlePlayerSelection,
     handleRemove: handlePlayerRemoval,
     handleRemoveAll: handleRemoveAllPlayers,
-  } = useFilterManagement({ data: playerData })
+  } = useFilterManagement({ filterName: "players", data: playerData })
 
   const {
     selectedItems: selectedTeams,
@@ -78,7 +81,7 @@ function Home() {
     handleSelect: handleTeamSelection,
     handleRemove: handleTeamRemoval,
     handleRemoveAll: handleRemoveAllTeams,
-  } = useFilterManagement({ data: teamData })
+  } = useFilterManagement({ filterName: "teams", data: teamData })
 
   const {
     selectedItems: selectedSeasons,
@@ -87,7 +90,11 @@ function Home() {
     handleSelect: handleSeasonSelection,
     handleRemove: handleSeasonRemoval,
     handleRemoveAll: handleRemoveAllSeasons,
-  } = useFilterManagement({ data: seasonData, nameKey: "season_years" })
+  } = useFilterManagement({
+    filterName: "seasons",
+    data: seasonData,
+    nameKey: "season_years",
+  })
 
   const {
     isFetching: isShotsFetching,
@@ -125,6 +132,43 @@ function Home() {
       saveAsJSON(selectedPlayers, selectedTeams, selectedSeasons, shotsData)
     }
   }
+
+  React.useEffect(() => {
+    if (teamData !== undefined || seasonData !== undefined) {
+      if (search.players !== undefined) {
+        // get validated players from url
+        console.log("Searched players", search.players)
+
+        // fetch players from db
+        console.log("fetched param players from the database")
+
+        // need a function for adding search params to selected
+        console.log("added search param players to selectedPlayers")
+      }
+      if (search.teams !== undefined) {
+        // get validated teams from url
+        console.log("Searched teams", search.teams)
+
+        // fetch teams from db
+        console.log("fetched param teams from the database")
+
+        // need a function for adding search params to selected
+        console.log("added search param teams to selectedTeams")
+      }
+      if (search.seasons !== undefined) {
+        // get validated seasons from url
+        console.log("Searched seasons", search.seasons)
+
+        // fetch seasons from db
+        console.log("fetched param seasons from the database")
+
+        // need a function for adding search params to selected
+        console.log("added search param seasons to selectedSeasons")
+      }
+      // get shots with the initial search query
+      // handleGenShots()
+    }
+  }, [teamData, seasonData])
 
   return (
     <div className="relative flex min-h-svh flex-col bg-background px-14">

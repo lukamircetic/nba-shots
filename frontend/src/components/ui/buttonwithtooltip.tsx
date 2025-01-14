@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/button"
+import { Button, ButtonProps } from "@/components/ui/button"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "./tooltip"
+import React from "react"
 
 type variantType =
   | "default"
@@ -16,7 +17,7 @@ type variantType =
   | null
   | undefined
 
-interface InputWithButtonProps {
+interface InputWithButtonProps extends ButtonProps {
   text: string
   onClick?: () => void
   disabled?: boolean
@@ -24,18 +25,16 @@ interface InputWithButtonProps {
   children: React.ReactNode
 }
 
-export function ButtonWithTooltip({
-  text,
-  children,
-  disabled,
-  variant,
-  ...props
-}: InputWithButtonProps) {
+export const ButtonWithTooltip = React.forwardRef<
+  HTMLButtonElement,
+  InputWithButtonProps
+>(({ text, children, disabled, variant, ...props }, ref) => {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
+            ref={ref}
             variant={variant ? variant : "outline"}
             size="icon"
             {...props}
@@ -50,4 +49,4 @@ export function ButtonWithTooltip({
       </Tooltip>
     </TooltipProvider>
   )
-}
+})
