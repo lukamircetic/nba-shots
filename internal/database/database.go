@@ -31,6 +31,7 @@ type Service interface {
 
 	GetShots(*types.RequestShotParams) ([]types.ReturnShot, error)
 	GetPlayerByID(int) (*types.Player, error)
+	GetPlayersByIDs([]int) ([]types.Player, error)
 	GetPlayersByName(string) ([]types.Player, error)
 	GetTeamByID(int) (*types.Team, error)
 	GetAllTeams() ([]types.Team, error)

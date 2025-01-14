@@ -37,6 +37,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 			r.Get("/", s.getPlayerByIDHandler)
 		})
 		r.Get("/", s.getPlayerByNameHandler)
+		r.Get("/multi", s.GetPlayersByIDsHandler)
 	})
 
 	r.Route("/team", func(r chi.Router) {

@@ -7,6 +7,7 @@ import (
 	"nba-shots/internal/types"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -80,6 +81,40 @@ func (s *Server) getPlayerByNameHandler(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	err = render.RenderList(w, r, NewPlayerListResponse(&players))
+	if err != nil {
+		render.Render(w, r, ErrRender(err))
+		return
+	}
+}
+
+func (s *Server) GetPlayersByIDsHandler(w http.ResponseWriter, r *http.Request) {
+	// 1 - parse the playerIDs from the URL they will come in the form of 1,2,3
+	playerQueryParams := r.URL.Query().Get("player_id")
+
+	if playerQueryParams == "" {
+		render.Render(w, r, ErrInvalidRequest(fmt.Errorf("no player ids passed in")))
+		return
+	}
+
+	log.Println("player Ids passed in", playerQueryParams)
+	playerStringIds := strings.Split(playerQueryParams, ",")
+	playerIds, err := ConvertStringSlicetoIntSlice(playerStringIds)
+
+	if err != nil {
+		render.Render(w, r, ErrInvalidRequest(err))
+	}
+
+	// 2 - send the playerID to the db service to get the player
+	players, err := s.db.GetPlayersByIDs(playerIds)
+
+	if err != nil {
+		render.Render(w, r, ErrInternalServer(err))
+		return
+	}
+	log.Println("Players received from db: ", players)
+
+	// 3 - send the player back to the client
 	err = render.RenderList(w, r, NewPlayerListResponse(&players))
 	if err != nil {
 		render.Render(w, r, ErrRender(err))
