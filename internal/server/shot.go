@@ -5,6 +5,7 @@ import (
 	"log"
 	"nba-shots/internal/types"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,6 +20,7 @@ type ShotResponse struct {
 }
 
 const shotArgsKey shotsContextKey = "shotArgs"
+const MINS_IN_A_QUARTER int = 12
 
 func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 	// 1 - parse the query args into a types.RequestShotParams variable
@@ -145,7 +147,8 @@ func ShotCtx(next http.Handler) http.Handler {
 		}
 
 		gameLocationParam := r.URL.Query().Get("game_location")
-		if gameLocationParam != "" {
+		gameLocationParam = strings.ToLower(gameLocationParam)
+		if gameLocationParam != "" && (gameLocationParam == "home" || gameLocationParam == "away") {
 			log.Println("game location", gameLocationParam)
 			shotArgs.GameLocation = gameLocationParam
 		}
@@ -159,6 +162,47 @@ func ShotCtx(next http.Handler) http.Handler {
 				render.Render(w, r, ErrInvalidRequest(err))
 			}
 			shotArgs.Quarters = quarters
+		}
+
+		startMinsLeftParams := r.URL.Query().Get("start_mins_left")
+		shotArgs.StartMinsLeft = MINS_IN_A_QUARTER
+		if startMinsLeftParams != "" {
+			log.Println("startMinsLeft", startMinsLeftParams)
+			startMinsLeft, err := strconv.Atoi(startMinsLeftParams)
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+			shotArgs.StartMinsLeft = startMinsLeft
+		}
+
+		endMinsLeftParams := r.URL.Query().Get("end_mins_left")
+		if endMinsLeftParams != "" {
+			log.Println("endMinsLeft", endMinsLeftParams)
+			endMinsLeft, err := strconv.Atoi(endMinsLeftParams)
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+			shotArgs.EndMinsLeft = endMinsLeft
+		}
+
+		startSecsLeftParams := r.URL.Query().Get("start_secs_left")
+		if startSecsLeftParams != "" {
+			log.Println("startSecsLeft", startSecsLeftParams)
+			startSecsLeft, err := strconv.Atoi(startSecsLeftParams)
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+			shotArgs.StartSecsLeft = startSecsLeft
+		}
+
+		endSecsLeftParams := r.URL.Query().Get("end_secs_left")
+		if endSecsLeftParams != "" {
+			log.Println("endSecsLeft", endSecsLeftParams)
+			endSecsLeft, err := strconv.Atoi(endSecsLeftParams)
+			if err != nil {
+				render.Render(w, r, ErrInvalidRequest(err))
+			}
+			shotArgs.EndSecsLeft = endSecsLeft
 		}
 
 		log.Println("shotArgs", shotArgs)
