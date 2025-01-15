@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS shot (
   loc_y FLOAT NOT NULL,
   shot_distance INTEGER NOT NULL,
   qtr SMALLINT NOT NULL,
+  total_time_left_secs SMALLINT NOT NULL,
   mins_left SMALLINT NOT NULL,
   secs_left SMALLINT NOT NULL,
   position VARCHAR(20) NOT NULL,

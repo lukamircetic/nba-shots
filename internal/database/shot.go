@@ -58,7 +58,6 @@ func (q *ShotQuery) nextArgNum() int {
 }
 
 func (q *ShotQuery) buildWhereClause() {
-	// log.Println("Building where clause")
 	if len(q.RequestArgs.PlayerIDs) > 0 {
 		pString := q.getWhereLogicforInts(q.RequestArgs.PlayerIDs, "player_id")
 		q.WhereConditions = append(q.WhereConditions, pString)
@@ -112,11 +111,18 @@ func (q *ShotQuery) buildWhereClause() {
 		q.WhereConditions = append(q.WhereConditions, qtrString)
 	}
 
-	// if !(q.RequestArgs.StartMinsLeft == 12 && q.RequestArgs.EndMinsLeft == 0 && q.RequestArgs.StartSecsLeft == 0 && q.RequestArgs.EndSecsLeft == 0) {
-	// 	gameTimeCond := q.getWhereLogicForGameTime()
-	// 	log.Println("Game times where logic: ", gameTimeCond)
-	// 	q.WhereConditions = append(q.WhereConditions, gameTimeCond)
-	// }
+	// assuming here that the times will be set to -1 if the query params arent set
+	if q.RequestArgs.StartTimeLeftSecs <= 720 && q.RequestArgs.StartTimeLeftSecs >= 0 {
+		startTimeString := fmt.Sprintf("total_time_left_secs <= $%d", q.nextArgNum())
+		q.Args = append(q.Args, q.RequestArgs.StartTimeLeftSecs)
+		q.WhereConditions = append(q.WhereConditions, startTimeString)
+	}
+
+	if q.RequestArgs.EndTimeLeftSecs <= 720 && q.RequestArgs.EndTimeLeftSecs >= 0 {
+		endTimeString := fmt.Sprintf("total_time_left_secs >= $%d", q.nextArgNum())
+		q.Args = append(q.Args, q.RequestArgs.EndTimeLeftSecs)
+		q.WhereConditions = append(q.WhereConditions, endTimeString)
+	}
 
 }
 
@@ -136,31 +142,3 @@ func (q *ShotQuery) getWhereLogicforInts(items []int, column string) string {
 	}
 	return cond
 }
-
-// func (q *ShotQuery) getWhereLogicForGameTime() string {
-// 	var cond string = "("
-// 	if q.RequestArgs.StartMinsLeft != 12 {
-// 		cond += fmt.Sprintf("(mins_left = $%d AND secs_left <= $%d)", q.nextArgNum(), q.nextArgNum())
-// 		q.Args = append(q.Args, q.RequestArgs.StartMinsLeft, q.RequestArgs.StartSecsLeft)
-// 	}
-
-// 	if q.RequestArgs.StartMinsLeft != 12 && (q.RequestArgs.EndMinsLeft != 0 || q.RequestArgs.EndSecsLeft != 0) {
-// 		cond += " OR "
-// 		cond += fmt.Sprintf("(mins_left < $%d AND mins_left > $%d)", q.nextArgNum(), q.nextArgNum())
-// 		q.Args = append(q.Args, q.RequestArgs.StartMinsLeft, q.RequestArgs.EndMinsLeft)
-// 	}
-// 	cond = fmt.Sprintf(`
-// 	((mins_left = $%d and secs_left <= $%d) OR (mins_left < $%d and mins_left > $%d) OR (mins_left = $%d and secs_left >= $%d))`,
-// 		q.nextArgNum(), q.nextArgNum(), q.nextArgNum(), q.nextArgNum(), q.nextArgNum(), q.nextArgNum(),
-// 	)
-// 	q.Args = append(
-// 		q.Args,
-// 		q.RequestArgs.StartMinsLeft,
-// 		q.RequestArgs.StartSecsLeft,
-// 		q.RequestArgs.StartMinsLeft,
-// 		q.RequestArgs.EndMinsLeft,
-// 		q.RequestArgs.EndMinsLeft,
-// 		q.RequestArgs.EndSecsLeft,
-// 	)
-// 	return cond
-// }

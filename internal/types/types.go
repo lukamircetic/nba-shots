@@ -30,29 +30,30 @@ type Game struct {
 }
 
 type Shot struct {
-	PlayerID      int       `db:"player_id"`
-	GameID        int       `db:"game_id"`
-	TeamID        int       `db:"team_id"`
-	HomeTeamID    int       `db:"home_team_id"`
-	AwayTeamID    int       `db:"away_team_id"`
-	SeasonYear    int       `db:"season_year"`
-	EventType     string    `db:"event_type"`
-	ShotMade      bool      `db:"shot_made"`
-	ActionType    string    `db:"action_type"`
-	ShotType      string    `db:"shot_type"`
-	BasicZone     string    `db:"basic_zone"`
-	ZoneName      string    `db:"zone_name"`
-	ZoneABB       string    `db:"zone_abb"`
-	ZoneRange     string    `db:"zone_range"`
-	LocX          float64   `db:"loc_x"`
-	LocY          float64   `db:"loc_y"`
-	ShotDistance  int       `db:"shot_distance"`
-	Quarter       int       `db:"qtr"`
-	MinsLeft      int       `db:"mins_left"`
-	SecsLeft      int       `db:"secs_left"`
-	Position      string    `db:"position"`
-	PositionGroup string    `db:"position_group"`
-	GameDate      time.Time `db:"game_date"`
+	PlayerID          int       `db:"player_id"`
+	GameID            int       `db:"game_id"`
+	TeamID            int       `db:"team_id"`
+	HomeTeamID        int       `db:"home_team_id"`
+	AwayTeamID        int       `db:"away_team_id"`
+	SeasonYear        int       `db:"season_year"`
+	EventType         string    `db:"event_type"`
+	ShotMade          bool      `db:"shot_made"`
+	ActionType        string    `db:"action_type"`
+	ShotType          string    `db:"shot_type"`
+	BasicZone         string    `db:"basic_zone"`
+	ZoneName          string    `db:"zone_name"`
+	ZoneABB           string    `db:"zone_abb"`
+	ZoneRange         string    `db:"zone_range"`
+	LocX              float64   `db:"loc_x"`
+	LocY              float64   `db:"loc_y"`
+	ShotDistance      int       `db:"shot_distance"`
+	Quarter           int       `db:"qtr"`
+	MinsLeft          int       `db:"mins_left"`
+	SecsLeft          int       `db:"secs_left"`
+	TotalTimeLeftSecs int       `db:"total_time_left_secs"`
+	Position          string    `db:"position"`
+	PositionGroup     string    `db:"position_group"`
+	GameDate          time.Time `db:"game_date"`
 }
 
 type PlayerTeam struct {
@@ -97,18 +98,16 @@ type PlayerTeamSeason struct {
 }
 
 type RequestShotParams struct {
-	PlayerIDs       []int     `json:"player_id"`
-	TeamIDs         []int     `json:"team_id"`
-	SeasonYears     []int     `json:"season_year"`
-	OpposingTeamIds []int     `json:"opposing_team_id"`
-	StartGameDate   time.Time `json:"start_game_date"`
-	EndGameDate     time.Time `json:"end_game_date"`
-	GameLocation    string    `json:"game_location"`
-	Quarters        []int     `json:"quarters"`
-	StartMinsLeft   int       `json:"start_mins_left"`
-	EndMinsLeft     int       `json:"end_mins_left"`
-	StartSecsLeft   int       `json:"start_secs_left"`
-	EndSecsLeft     int       `json:"end_secs_left"`
+	PlayerIDs         []int     `json:"player_id"`
+	TeamIDs           []int     `json:"team_id"`
+	SeasonYears       []int     `json:"season_year"`
+	OpposingTeamIds   []int     `json:"opposing_team_id"`
+	StartGameDate     time.Time `json:"start_game_date"`
+	EndGameDate       time.Time `json:"end_game_date"`
+	GameLocation      string    `json:"game_location"`
+	Quarters          []int     `json:"quarter"`
+	StartTimeLeftSecs int       `json:"start_time_left"`
+	EndTimeLeftSecs   int       `json:"end_time_left"`
 }
 
 func NewRequestShotParams() *RequestShotParams {

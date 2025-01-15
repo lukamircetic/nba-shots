@@ -164,6 +164,7 @@ func (s *service) InsertShots(shots []types.Shot) error {
 			shot.Quarter,
 			shot.MinsLeft,
 			shot.SecsLeft,
+			shot.TotalTimeLeftSecs,
 			shot.Position,
 			shot.PositionGroup,
 			shot.GameDate,

@@ -2,9 +2,11 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"nba-shots/internal/types"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -146,6 +148,18 @@ func ShotCtx(next http.Handler) http.Handler {
 			shotArgs.EndGameDate = endGameDate
 		}
 
+		if !shotArgs.StartGameDate.IsZero() &&
+			!shotArgs.EndGameDate.IsZero() &&
+			!shotArgs.StartGameDate.Before(shotArgs.EndGameDate) &&
+			!shotArgs.StartGameDate.Equal(shotArgs.EndGameDate) {
+			render.Render(w, r, ErrInvalidRequest(
+				fmt.Errorf("start_game_date: %s is after end_game_date: %s",
+					startGameDateParam,
+					endGameDateParam,
+				),
+			))
+		}
+
 		gameLocationParam := r.URL.Query().Get("game_location")
 		gameLocationParam = strings.ToLower(gameLocationParam)
 		if gameLocationParam != "" && (gameLocationParam == "home" || gameLocationParam == "away") {
@@ -164,49 +178,68 @@ func ShotCtx(next http.Handler) http.Handler {
 			shotArgs.Quarters = quarters
 		}
 
-		startMinsLeftParams := r.URL.Query().Get("start_mins_left")
-		shotArgs.StartMinsLeft = MINS_IN_A_QUARTER
-		if startMinsLeftParams != "" {
-			log.Println("startMinsLeft", startMinsLeftParams)
-			startMinsLeft, err := strconv.Atoi(startMinsLeftParams)
+		startTimeLeftParams := r.URL.Query().Get("start_time_left")
+		shotArgs.StartTimeLeftSecs = -1
+		if startTimeLeftParams != "" {
+			log.Println("start time left passed in:", startTimeLeftParams)
+			startTimeLeft, err := parseClockTimeLeftToSecs(startTimeLeftParams)
 			if err != nil {
 				render.Render(w, r, ErrInvalidRequest(err))
 			}
-			shotArgs.StartMinsLeft = startMinsLeft
+			shotArgs.StartTimeLeftSecs = startTimeLeft
 		}
 
-		endMinsLeftParams := r.URL.Query().Get("end_mins_left")
-		if endMinsLeftParams != "" {
-			log.Println("endMinsLeft", endMinsLeftParams)
-			endMinsLeft, err := strconv.Atoi(endMinsLeftParams)
+		endTimeLeftParams := r.URL.Query().Get("end_time_left")
+		shotArgs.EndTimeLeftSecs = -1
+		if endTimeLeftParams != "" {
+			log.Println("end time left passed in:", startTimeLeftParams)
+			endTimeLeft, err := parseClockTimeLeftToSecs(endTimeLeftParams)
 			if err != nil {
 				render.Render(w, r, ErrInvalidRequest(err))
 			}
-			shotArgs.EndMinsLeft = endMinsLeft
+			shotArgs.EndTimeLeftSecs = endTimeLeft
 		}
 
-		startSecsLeftParams := r.URL.Query().Get("start_secs_left")
-		if startSecsLeftParams != "" {
-			log.Println("startSecsLeft", startSecsLeftParams)
-			startSecsLeft, err := strconv.Atoi(startSecsLeftParams)
-			if err != nil {
-				render.Render(w, r, ErrInvalidRequest(err))
-			}
-			shotArgs.StartSecsLeft = startSecsLeft
-		}
-
-		endSecsLeftParams := r.URL.Query().Get("end_secs_left")
-		if endSecsLeftParams != "" {
-			log.Println("endSecsLeft", endSecsLeftParams)
-			endSecsLeft, err := strconv.Atoi(endSecsLeftParams)
-			if err != nil {
-				render.Render(w, r, ErrInvalidRequest(err))
-			}
-			shotArgs.EndSecsLeft = endSecsLeft
+		// validate that the start time is greater than the end time
+		if shotArgs.EndTimeLeftSecs > shotArgs.StartTimeLeftSecs {
+			render.Render(w, r, ErrInvalidRequest(
+				fmt.Errorf("start_time_left is less than end_time_left: %s < %s",
+					startTimeLeftParams,
+					endTimeLeftParams,
+				),
+			))
 		}
 
 		log.Println("shotArgs", shotArgs)
 		ctx := context.WithValue(r.Context(), shotArgsKey, shotArgs)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func parseClockTimeLeftToSecs(t string) (int, error) {
+	// Expecting format: M:S
+	re := regexp.MustCompile("^([0-9]|1[0-2]):([0-5][0-9])$")
+
+	if !re.MatchString(t) {
+		return 0, fmt.Errorf("invalid request time left format for")
+	}
+
+	comps := strings.Split(t, ":")
+	minutes, err := strconv.Atoi(comps[0])
+	if err != nil {
+		return 0, fmt.Errorf("unable to parse minutes from search params: %v", err)
+	}
+
+	seconds, err := strconv.Atoi(comps[1])
+	if err != nil {
+		return 0, fmt.Errorf("unable to parse seconds from search params: %v", err)
+	}
+
+	total_secs := (minutes * 60) + seconds
+
+	if total_secs > 720 {
+		return 0, fmt.Errorf("time requested out of bounds. should be [0, 720], got: %d", total_secs)
+	}
+
+	return total_secs, nil
 }

@@ -372,32 +372,37 @@ func allShots(data *[]rawShotData) *[]types.Shot {
 	var formattedShots []types.Shot
 	for _, shot := range *data {
 		formattedShots = append(formattedShots, types.Shot{
-			PlayerID:      shot.PlayerID,
-			GameID:        shot.GameID,
-			TeamID:        shot.TeamID,
-			HomeTeamID:    teamAbbrevID[shot.HomeTeam],
-			AwayTeamID:    teamAbbrevID[shot.AwayTeam],
-			SeasonYear:    shot.SeasonEndYear,
-			EventType:     shot.EventType,
-			ShotMade:      shot.ShotMade,
-			ActionType:    shot.ActionType,
-			ShotType:      shot.ShotType,
-			BasicZone:     shot.BasicZone,
-			ZoneName:      shot.ZoneName,
-			ZoneABB:       shot.ZoneABB,
-			ZoneRange:     shot.ZoneRange,
-			LocX:          shot.LocX,
-			LocY:          shot.LocY,
-			ShotDistance:  shot.ShotDistance,
-			Quarter:       shot.Quarter,
-			MinsLeft:      shot.MinsLeft,
-			SecsLeft:      shot.SecsLeft,
-			Position:      shot.Position,
-			PositionGroup: shot.PositionGroup,
-			GameDate:      shot.GameDate,
+			PlayerID:          shot.PlayerID,
+			GameID:            shot.GameID,
+			TeamID:            shot.TeamID,
+			HomeTeamID:        teamAbbrevID[shot.HomeTeam],
+			AwayTeamID:        teamAbbrevID[shot.AwayTeam],
+			SeasonYear:        shot.SeasonEndYear,
+			EventType:         shot.EventType,
+			ShotMade:          shot.ShotMade,
+			ActionType:        shot.ActionType,
+			ShotType:          shot.ShotType,
+			BasicZone:         shot.BasicZone,
+			ZoneName:          shot.ZoneName,
+			ZoneABB:           shot.ZoneABB,
+			ZoneRange:         shot.ZoneRange,
+			LocX:              shot.LocX,
+			LocY:              shot.LocY,
+			ShotDistance:      shot.ShotDistance,
+			Quarter:           shot.Quarter,
+			MinsLeft:          shot.MinsLeft,
+			SecsLeft:          shot.SecsLeft,
+			TotalTimeLeftSecs: generateTotalTimeInSecs(shot.MinsLeft, shot.SecsLeft),
+			Position:          shot.Position,
+			PositionGroup:     shot.PositionGroup,
+			GameDate:          shot.GameDate,
 		})
 	}
 	return &formattedShots
+}
+
+func generateTotalTimeInSecs(minLeft int, secLeft int) int {
+	return (minLeft * 60) + secLeft
 }
 
 func allPlayerTeams(data *[]rawShotData) *[]types.PlayerTeam {
