@@ -52,11 +52,13 @@ func (q *ShotQuery) buildQueryString() (string, error) {
 	return queryString, nil
 }
 
+// simple helper for keeping track of which is the current arg number
 func (q *ShotQuery) nextArgNum() int {
 	q.ArgCount++
 	return q.ArgCount
 }
 
+// populates the q.WhereConditions param based on the RequestArgs provided
 func (q *ShotQuery) buildWhereClause() {
 	if len(q.RequestArgs.PlayerIDs) > 0 {
 		pString := q.getWhereLogicforInts(q.RequestArgs.PlayerIDs, "player_id")
@@ -127,6 +129,8 @@ func (q *ShotQuery) buildWhereClause() {
 }
 
 // This function make the arg string, adds the args, and increments arg counter
+// has conditional logic where it uses = for comparison if only one item
+// or uses in () if there are multiple ids
 func (q *ShotQuery) getWhereLogicforInts(items []int, column string) string {
 	var cond string
 	if len(items) == 1 {
@@ -142,3 +146,43 @@ func (q *ShotQuery) getWhereLogicforInts(items []int, column string) string {
 	}
 	return cond
 }
+
+/* This is what a query string using all params looks like:
+
+```
+Initiating shots query with query string and args
+:
+SELECT id, loc_x, loc_y, shot_made, shot_type
+FROM shot
+WHERE player_id = $1
+AND team_id = $2
+AND season_year = $3
+AND ((home_team_id = team_id AND away_team_id IN ($4, $5)) OR (away_team_id = team_id and home_team_id IN ($6, $7)))
+AND game_date >= $8
+AND game_date <= $9
+AND team_id = home_team_id
+AND qtr = $10
+AND ((mins_left = $11 and secs_left <= $12) OR (mins_left < $13 an
+d mins_left > $14) OR (mins_left = $15 and secs_left >= $16))
+
+[
+1 - 1628369
+2 - 1610612738
+3 - 2024
+4 - 1610612761
+5 - 1610612762
+6 - 1610612761
+7 - 1610612762
+8 - 2023-02-01 00:00:00 +0000 UTC
+9 - 2023-02-01 00:00:00 +0000 UTC
+10 - 4
+11 - 10
+12 - 30
+13 - 10
+14 - 2
+15 - 2
+16 - 5
+]
+```
+
+*/
