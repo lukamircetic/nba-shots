@@ -1,3 +1,5 @@
+import { format } from "date-fns"
+
 interface HasId {
   id: string
 }
@@ -118,6 +120,8 @@ export async function fetchShotsWithFilters(
     team_id: teams ? createIdFilterString(teams) : undefined,
     season: seasons ? createIdFilterString(seasons) : undefined,
     opposing_team_id: opp ? createIdFilterString(opp) : undefined,
+    start_game_date: sDate ? format(sDate, "yyyy-MM-dd") : undefined,
+    end_game_date: eDate ? format(eDate, "yyyy-MM-dd") : undefined,
   }
 
   Object.entries(filters).forEach(([key, value]) => {
@@ -125,7 +129,7 @@ export async function fetchShotsWithFilters(
       queryString += `&${key}=${value}`
     }
   })
-
+  console.log("qstring", queryString)
   const response = await fetch(queryString)
   const data: ShotResponse[] = await response.json()
 

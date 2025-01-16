@@ -13,6 +13,9 @@ const searchSchema = z.object({
   teams: singleOrMultipleCSV,
   seasons: singleOrMultipleCSV,
   opp_teams: singleOrMultipleCSV,
+  start_date: z.string().date().optional(),
+  end_date: z.string().date().optional(),
+  start_time_left: z.number().optional(),
 })
 
 export const Route = createFileRoute("/")({

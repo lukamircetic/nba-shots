@@ -40,13 +40,13 @@ import { saveAsJSON } from "@/api/exportjson"
 import { useSearch } from "@tanstack/react-router"
 import { DatePicker } from "../ui/datepicker"
 import { format } from "date-fns"
+import { useDateFilterManagement } from "../filter/useDateFilterManagement"
 
 function Home() {
   const search = useSearch({ from: "/" })
 
   const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-  const [startDate, setStartDate] = React.useState<Date>()
   const [endDate, setEndDate] = React.useState<Date>()
 
   const initialLoad = React.useRef<boolean>(true)
@@ -127,6 +127,18 @@ function Home() {
   } = useFilterManagement({ filterName: "opp_teams", data: teamData })
 
   const {
+    selectedDate: selectedStartDate,
+    handleSelect: handleSelectStartDate,
+    handleRemove: handleRemoveStartDate,
+  } = useDateFilterManagement({ filterName: "start_date" })
+
+  const {
+    selectedDate: selectedEndDate,
+    handleSelect: handleSelectEndDate,
+    handleRemove: handleRemoveEndDate,
+  } = useDateFilterManagement({ filterName: "end_date" })
+
+  const {
     isFetching: isShotsFetching,
     isError: isShotsError,
     data: shotsData,
@@ -138,8 +150,8 @@ function Home() {
       selectedTeams,
       selectedSeasons,
       selectedOppTeams,
-      startDate,
-      endDate,
+      selectedStartDate,
+      selectedEndDate,
     ],
     queryFn: ({ queryKey }) => {
       const [players, teams, seasons, opps, sDate, eDate] = queryKey
@@ -240,6 +252,15 @@ function Home() {
           }
         }
       }
+      if (search.start_date !== undefined) {
+        const paramDate = new Date(search.start_date)
+        handleSelectStartDate(paramDate)
+      }
+      if (search.end_date !== undefined) {
+        const paramDate = new Date(search.end_date)
+        handleSelectEndDate(paramDate)
+      }
+
       setIsGenShots(true)
     }
   }, [paramPlayersData, teamData, seasonData])
@@ -342,17 +363,21 @@ function Home() {
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <p>Start Date</p>
                   <DatePicker
-                    date={startDate}
-                    setDate={setStartDate}
-                    defaultDate={endDate ? endDate : new Date(2024, 0)}
-                    after={endDate}
+                    date={selectedStartDate}
+                    setDate={handleSelectStartDate}
+                    defaultDate={
+                      selectedEndDate ? selectedEndDate : new Date(2024, 0)
+                    }
+                    after={selectedEndDate}
                   />
                   <p>End Date</p>
                   <DatePicker
-                    date={endDate}
-                    setDate={setEndDate}
-                    defaultDate={startDate ? startDate : new Date(2024, 0)}
-                    before={startDate}
+                    date={selectedEndDate}
+                    setDate={handleSelectEndDate}
+                    defaultDate={
+                      selectedStartDate ? selectedStartDate : new Date(2024, 0)
+                    }
+                    before={selectedStartDate}
                   />
                 </div>
               </AccordionContent>
@@ -479,23 +504,23 @@ function Home() {
                   </DestructiveButton>
                 </li>
               )}
-              {startDate && (
+              {selectedStartDate && (
                 <li>
                   <DestructiveButton
                     id=""
-                    value={`${format(startDate, "PPP")}`}
-                    handleClick={() => setStartDate(undefined)}
+                    value={`${format(selectedStartDate, "PPP")}`}
+                    handleClick={handleRemoveStartDate}
                   >
                     <CalendarArrowDown />
                   </DestructiveButton>
                 </li>
               )}
-              {endDate && (
+              {selectedEndDate && (
                 <li>
                   <DestructiveButton
                     id=""
-                    value={format(endDate, "PPP")}
-                    handleClick={() => setEndDate(undefined)}
+                    value={format(selectedEndDate, "PPP")}
+                    handleClick={handleRemoveEndDate}
                   >
                     <CalendarArrowUp />
                   </DestructiveButton>

@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
@@ -15,7 +14,7 @@ import {
 
 interface DatePickerProps {
   date: Date | undefined
-  setDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+  setDate: (value: Date) => void
   defaultDate: Date
   before?: Date
   after?: Date
@@ -56,6 +55,7 @@ export function DatePicker({
             before: before ? before : new Date(2003, 9, 27),
             after: after ? after : new Date(2024, 3, 13),
           }}
+          required
         />
       </PopoverContent>
     </Popover>
