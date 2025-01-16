@@ -12,6 +12,7 @@ const searchSchema = z.object({
   players: singleOrMultipleCSV,
   teams: singleOrMultipleCSV,
   seasons: singleOrMultipleCSV,
+  opp_teams: singleOrMultipleCSV,
 })
 
 export const Route = createFileRoute("/")({

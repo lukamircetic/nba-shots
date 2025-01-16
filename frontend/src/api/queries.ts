@@ -2,32 +2,47 @@ interface HasId {
   id: string
 }
 
+export interface Player extends HasId {
+  id: string
+  name: string
+}
+
+export interface Team extends HasId {
+  id: string
+  name: string
+}
+
+export interface Season extends HasId {
+  id: string
+  season_years: string
+}
+
 type PlayerResponse = {
-  id: number,
-  name: string,
-  elapsed: number,
+  id: number
+  name: string
+  elapsed: number
 }
 
 type TeamResponse = {
-  id: number,
-  name: string,
-  abbreviation: string,
-  elapsed: number,
+  id: number
+  name: string
+  abbreviation: string
+  elapsed: number
 }
 
 type SeasonResponse = {
-  id: number,
-  season_years: string,
-  elapsed: number,
+  id: number
+  season_years: string
+  elapsed: number
 }
 
 type ShotResponse = {
-  id: number,
-  loc_x: number,
-  loc_y: number,
-  shot_made: boolean,
-  shot_type: string,
-  elapsed: number,
+  id: number
+  loc_x: number
+  loc_y: number
+  shot_made: boolean
+  shot_type: string
+  elapsed: number
 }
 
 export async function fetchPlayersByName(name: string) {
@@ -45,7 +60,9 @@ export async function fetchPlayersByName(name: string) {
 }
 
 export async function fetchPlayersByIds(playerIds: string) {
-  const response = await fetch(`http://localhost:8080/player/multi?player_id=${playerIds}`)
+  const response = await fetch(
+    `http://localhost:8080/player/multi?player_id=${playerIds}`,
+  )
   const data: PlayerResponse[] = await response.json()
 
   if (!response.ok) {
@@ -87,12 +104,20 @@ export async function fetchAllSeasons() {
   }))
 }
 
-export async function fetchShotsWithFilters(players?: HasId[], teams?: HasId[], seasons?: HasId[]) {
-  let queryString = 'http://localhost:8080/shots' + '?'
+export async function fetchShotsWithFilters(
+  players?: HasId[],
+  teams?: HasId[],
+  seasons?: HasId[],
+  opp?: HasId[],
+  sDate?: Date,
+  eDate?: Date,
+) {
+  let queryString = "http://localhost:8080/shots" + "?"
   let filters = {
-    "player_id": players ? createIdFilterString(players) : undefined,
-    "team_id": teams ? createIdFilterString(teams) : undefined,
-    "season": seasons ? createIdFilterString(seasons) : undefined,
+    player_id: players ? createIdFilterString(players) : undefined,
+    team_id: teams ? createIdFilterString(teams) : undefined,
+    season: seasons ? createIdFilterString(seasons) : undefined,
+    opposing_team_id: opp ? createIdFilterString(opp) : undefined,
   }
 
   Object.entries(filters).forEach(([key, value]) => {

@@ -13,26 +13,45 @@ import {
   fetchPlayersByIds,
   fetchPlayersByName,
   fetchShotsWithFilters,
+  Player,
+  Season,
+  Team,
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
 import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
-import { FileCode, ImageDown, Pickaxe } from "lucide-react"
+import {
+  CalendarArrowDown,
+  CalendarArrowUp,
+  FileCode,
+  ImageDown,
+  Pickaxe,
+  Swords,
+  Trophy,
+  UserRound,
+  UsersRound,
+} from "lucide-react"
 import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 import { DialogShareButton } from "./sharedialog"
 import { saveSvgAsPng } from "@/api/saveimage"
 import { saveAsJSON } from "@/api/exportjson"
 import { useSearch } from "@tanstack/react-router"
+import { DatePicker } from "../ui/datepicker"
+import { format } from "date-fns"
 
 function Home() {
   const search = useSearch({ from: "/" })
-  const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
-  const initialLoad = React.useRef<boolean>(true)
-  const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-  const svgRef = React.useRef<SVGSVGElement>(null)
 
+  const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
+  const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
+  const [startDate, setStartDate] = React.useState<Date>()
+  const [endDate, setEndDate] = React.useState<Date>()
+
+  const initialLoad = React.useRef<boolean>(true)
+  const svgRef = React.useRef<SVGSVGElement>(null)
+  // 2003-10-27 -> 2024-04-13
   const {
     isPending: isPlayerPending,
     isError: isPlayerError,
@@ -99,16 +118,39 @@ function Home() {
   })
 
   const {
+    selectedItems: selectedOppTeams,
+    searchedItems: searchedOppTeams,
+    handleSelectAll: handleSelectAllOppTeams,
+    handleSelect: handleOppTeamSelection,
+    handleRemove: handleOppTeamRemoval,
+    handleRemoveAll: handleRemoveAllOppTeams,
+  } = useFilterManagement({ filterName: "opp_teams", data: teamData })
+
+  const {
     isFetching: isShotsFetching,
     isError: isShotsError,
     data: shotsData,
     error: shotsError,
     refetch: refetchShots,
   } = useQuery({
-    queryKey: [selectedPlayers, selectedTeams, selectedSeasons],
+    queryKey: [
+      selectedPlayers,
+      selectedTeams,
+      selectedSeasons,
+      selectedOppTeams,
+      startDate,
+      endDate,
+    ],
     queryFn: ({ queryKey }) => {
-      const [p, t, s] = queryKey
-      return fetchShotsWithFilters(p, t, s)
+      const [players, teams, seasons, opps, sDate, eDate] = queryKey
+      return fetchShotsWithFilters(
+        players as Player[] | undefined,
+        teams as Team[] | undefined,
+        seasons as Season[] | undefined,
+        opps as Team[] | undefined,
+        sDate as Date | undefined,
+        eDate as Date | undefined,
+      )
     },
     enabled: false,
   })
@@ -187,6 +229,14 @@ function Home() {
           const season = seasonData.find((s) => s.id === seasonId)
           if (season !== undefined) {
             handleSeasonSelection(season.id, season)
+          }
+        }
+      }
+      if (search.opp_teams !== undefined && teamData !== undefined) {
+        for (const teamId of search.opp_teams.split(",")) {
+          const team = teamData.find((t) => t.id === teamId)
+          if (team !== undefined) {
+            handleOppTeamSelection(team.id, team)
           }
         }
       }
@@ -270,6 +320,55 @@ function Home() {
                 </div>
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>Opposing Team</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <FilterSection
+                    title="Opposing Team"
+                    items={searchedOppTeams}
+                    isLoading={isTeamPending}
+                    isError={isTeamError}
+                    error={isTeamError ? teamError : null}
+                    onSelect={handleOppTeamSelection}
+                    onSelectAll={handleSelectAllOppTeams}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5">
+              <AccordionTrigger>Game Date</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <p>Start Date</p>
+                  <DatePicker
+                    date={startDate}
+                    setDate={setStartDate}
+                    defaultDate={endDate ? endDate : new Date(2024, 0)}
+                    after={endDate}
+                  />
+                  <p>End Date</p>
+                  <DatePicker
+                    date={endDate}
+                    setDate={setEndDate}
+                    defaultDate={startDate ? startDate : new Date(2024, 0)}
+                    before={startDate}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6">
+              <AccordionTrigger>Game Location</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4"></div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-7">
+              <AccordionTrigger>Game Time</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4"></div>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </div>
         <div className="ml-12 flex w-1/5 flex-col space-y-4">
@@ -287,7 +386,9 @@ function Home() {
                       id={player.id}
                       value={player.name}
                       handleClick={handlePlayerRemoval}
-                    />
+                    >
+                      <UserRound size={20} />
+                    </DestructiveButton>
                   </li>
                 ))}
               {/* basically if you select all, and theres more than 5 players it shows a summary of the search key instead of all the players */}
@@ -299,7 +400,9 @@ function Home() {
                       id=""
                       value={`%${playerSearchKey}% (${selectedPlayers.length} players)`}
                       handleClick={handleRemoveAllPlayers}
-                    />
+                    >
+                      <UserRound size={20} />
+                    </DestructiveButton>
                   </li>
                 )}
               {selectedTeams &&
@@ -310,7 +413,9 @@ function Home() {
                       id={team.id}
                       value={team.name}
                       handleClick={handleTeamRemoval}
-                    />
+                    >
+                      <UsersRound size={20} />
+                    </DestructiveButton>
                   </li>
                 ))}
               {selectedTeams && searchedTeams?.length === 0 && (
@@ -319,7 +424,9 @@ function Home() {
                     id=""
                     value={`All Teams`}
                     handleClick={handleRemoveAllTeams}
-                  />
+                  >
+                    <UsersRound size={20} />
+                  </DestructiveButton>
                 </li>
               )}
               {selectedSeasons &&
@@ -330,7 +437,9 @@ function Home() {
                       id={season.id}
                       value={season.season_years}
                       handleClick={handleSeasonRemoval}
-                    />
+                    >
+                      <Trophy size={20} />
+                    </DestructiveButton>
                   </li>
                 ))}
               {selectedSeasons &&
@@ -341,9 +450,57 @@ function Home() {
                       id=""
                       value="2003-2024" // TODO: make this dynamic in V2
                       handleClick={handleRemoveAllSeasons}
-                    />
+                    >
+                      <Trophy />
+                    </DestructiveButton>
                   </li>
                 )}
+              {selectedOppTeams &&
+                selectedOppTeams?.length !== 0 &&
+                selectedOppTeams.map((team, key) => (
+                  <li key={key}>
+                    <DestructiveButton
+                      id={team.id}
+                      value={team.name}
+                      handleClick={handleOppTeamRemoval}
+                    >
+                      <Swords size={20} />
+                    </DestructiveButton>
+                  </li>
+                ))}
+              {selectedOppTeams && searchedOppTeams?.length === 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`All Teams`}
+                    handleClick={handleRemoveAllOppTeams}
+                  >
+                    <Swords />
+                  </DestructiveButton>
+                </li>
+              )}
+              {startDate && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`${format(startDate, "PPP")}`}
+                    handleClick={() => setStartDate(undefined)}
+                  >
+                    <CalendarArrowDown />
+                  </DestructiveButton>
+                </li>
+              )}
+              {endDate && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={format(endDate, "PPP")}
+                    handleClick={() => setEndDate(undefined)}
+                  >
+                    <CalendarArrowUp />
+                  </DestructiveButton>
+                </li>
+              )}
             </ul>
           </div>
           <div>

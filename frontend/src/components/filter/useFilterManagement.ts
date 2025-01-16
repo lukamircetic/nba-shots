@@ -3,7 +3,7 @@ import { FilterItem } from "./types"
 import { useNavigate } from "@tanstack/react-router"
 
 interface UseFilterManagementProps<T extends FilterItem> {
-  filterName: "players" | "teams" | "seasons"
+  filterName: "players" | "teams" | "seasons" | "opp_teams"
   data: T[] | undefined
   nameKey?: keyof T
 }

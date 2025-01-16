@@ -127,7 +127,7 @@ func ShotCtx(next http.Handler) http.Handler {
 		startGameDateParam := r.URL.Query().Get("start_game_date")
 		if startGameDateParam != "" {
 			log.Println("start game date", startGameDateParam)
-			startGameDate, err := time.Parse("01-02-2006", startGameDateParam)
+			startGameDate, err := time.Parse("2006-01-02", startGameDateParam)
 
 			if err != nil {
 				render.Render(w, r, ErrInvalidRequest(err))
@@ -139,7 +139,7 @@ func ShotCtx(next http.Handler) http.Handler {
 		endGameDateParam := r.URL.Query().Get("end_game_date")
 		if endGameDateParam != "" {
 			log.Println("end game date", endGameDateParam)
-			endGameDate, err := time.Parse("01-02-2006", endGameDateParam)
+			endGameDate, err := time.Parse("2006-01-02", endGameDateParam)
 
 			if err != nil {
 				render.Render(w, r, ErrInvalidRequest(err))
