@@ -14,6 +14,11 @@ export interface Team extends HasId {
   name: string
 }
 
+export interface Quarter extends HasId {
+  id: string
+  name: string
+}
+
 export interface Season extends HasId {
   id: string
   season_years: string
@@ -113,6 +118,8 @@ export async function fetchShotsWithFilters(
   opp?: HasId[],
   sDate?: Date,
   eDate?: Date,
+  gLoc?: "home" | "away",
+  qtr?: Quarter[],
 ) {
   let queryString = "http://localhost:8080/shots" + "?"
   let filters = {
@@ -122,6 +129,8 @@ export async function fetchShotsWithFilters(
     opposing_team_id: opp ? createIdFilterString(opp) : undefined,
     start_game_date: sDate ? format(sDate, "yyyy-MM-dd") : undefined,
     end_game_date: eDate ? format(eDate, "yyyy-MM-dd") : undefined,
+    game_location: gLoc ? gLoc : undefined,
+    quarter: qtr ? createIdFilterString(qtr) : undefined,
   }
 
   Object.entries(filters).forEach(([key, value]) => {
@@ -129,7 +138,7 @@ export async function fetchShotsWithFilters(
       queryString += `&${key}=${value}`
     }
   })
-  console.log("qstring", queryString)
+
   const response = await fetch(queryString)
   const data: ShotResponse[] = await response.json()
 

@@ -15,7 +15,10 @@ const searchSchema = z.object({
   opp_teams: singleOrMultipleCSV,
   start_date: z.string().date().optional(),
   end_date: z.string().date().optional(),
-  start_time_left: z.number().optional(),
+  game_loc: z.string().optional(),
+  quarter: singleOrMultipleCSV,
+  start_time_left: z.string().optional(),
+  end_time_left: z.string().optional(),
 })
 
 export const Route = createFileRoute("/")({

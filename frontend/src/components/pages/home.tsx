@@ -14,6 +14,7 @@ import {
   fetchPlayersByName,
   fetchShotsWithFilters,
   Player,
+  Quarter,
   Season,
   Team,
 } from "@/api/queries"
@@ -27,6 +28,7 @@ import {
   CalendarArrowUp,
   FileCode,
   ImageDown,
+  MapPin,
   Pickaxe,
   Swords,
   Trophy,
@@ -41,16 +43,38 @@ import { useSearch } from "@tanstack/react-router"
 import { DatePicker } from "../ui/datepicker"
 import { format } from "date-fns"
 import { useDateFilterManagement } from "../filter/useDateFilterManagement"
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
+import { Label } from "../ui/label"
+import { useStringFilterManagement } from "../filter/useStringFilterManagement"
+import { Capitalize } from "@/api/helpers"
+import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
+import { TimePickerDemo } from "../ui/time-picker"
+
+const quarters = [
+  { id: "1", name: "1st" },
+  { id: "2", name: "2nd" },
+  { id: "3", name: "3rd" },
+  { id: "4", name: "4th" },
+  { id: "5", name: "OT" },
+  { id: "6", name: "2OT" },
+  { id: "7", name: "3OT" },
+  { id: "8", name: "4OT" },
+]
 
 function Home() {
   const search = useSearch({ from: "/" })
 
   const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-  const [endDate, setEndDate] = React.useState<Date>()
-
+  const [startTime, setStartTime] = React.useState<Date | undefined>(
+    new Date(new Date().setHours(0, 12, 0, 0)),
+  )
+  const [endTime, setEndTime] = React.useState<Date | undefined>(
+    new Date(new Date().setHours(0, 0, 0, 0)),
+  )
   const initialLoad = React.useRef<boolean>(true)
   const svgRef = React.useRef<SVGSVGElement>(null)
+
   // 2003-10-27 -> 2024-04-13
   const {
     isPending: isPlayerPending,
@@ -127,6 +151,15 @@ function Home() {
   } = useFilterManagement({ filterName: "opp_teams", data: teamData })
 
   const {
+    selectedItems: selectedQuarter,
+    searchedItems: searchedQuarter,
+    handleSelectAll: handleSelectAllQuarter,
+    handleSelect: handleQuarterSelection,
+    handleRemove: handleQuarterRemoval,
+    handleRemoveAll: handleRemoveAllQuarter,
+  } = useFilterManagement({ filterName: "quarter", data: quarters })
+
+  const {
     selectedDate: selectedStartDate,
     handleSelect: handleSelectStartDate,
     handleRemove: handleRemoveStartDate,
@@ -137,6 +170,12 @@ function Home() {
     handleSelect: handleSelectEndDate,
     handleRemove: handleRemoveEndDate,
   } = useDateFilterManagement({ filterName: "end_date" })
+
+  const {
+    selectedItem: selectedGameLoc,
+    handleSelect: handleSelectGameLoc,
+    handleRemove: handleRemoveGameLoc,
+  } = useStringFilterManagement({ filterName: "game_loc", defaultValue: "" })
 
   const {
     isFetching: isShotsFetching,
@@ -152,9 +191,11 @@ function Home() {
       selectedOppTeams,
       selectedStartDate,
       selectedEndDate,
+      selectedGameLoc,
+      selectedQuarter,
     ],
     queryFn: ({ queryKey }) => {
-      const [players, teams, seasons, opps, sDate, eDate] = queryKey
+      const [players, teams, seasons, opps, sDate, eDate, gLoc, qtr] = queryKey
       return fetchShotsWithFilters(
         players as Player[] | undefined,
         teams as Team[] | undefined,
@@ -162,6 +203,8 @@ function Home() {
         opps as Team[] | undefined,
         sDate as Date | undefined,
         eDate as Date | undefined,
+        gLoc as "home" | "away" | undefined,
+        qtr as Quarter[] | undefined,
       )
     },
     enabled: false,
@@ -260,7 +303,21 @@ function Home() {
         const paramDate = new Date(search.end_date)
         handleSelectEndDate(paramDate)
       }
-
+      if (search.game_loc !== undefined) {
+        if (search.game_loc == "home" || search.game_loc === "away") {
+          handleSelectGameLoc(search.game_loc)
+        } else {
+          handleRemoveGameLoc()
+        }
+      }
+      if (search.quarter !== undefined) {
+        for (const qId of search.quarter.split(",")) {
+          const qtr = quarters.find((q) => q.id === qId)
+          if (qtr !== undefined) {
+            handleQuarterSelection(qtr.id, qtr)
+          }
+        }
+      }
       setIsGenShots(true)
     }
   }, [paramPlayersData, teamData, seasonData])
@@ -385,13 +442,84 @@ function Home() {
             <AccordionItem value="item-6">
               <AccordionTrigger>Game Location</AccordionTrigger>
               <AccordionContent>
-                <div className="ml-[1px] max-w-sm space-y-4"></div>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <RadioGroup
+                    defaultValue=""
+                    value={selectedGameLoc}
+                    onValueChange={handleSelectGameLoc}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="" id="option-one" />
+                      <Label htmlFor="all-locations" className="font-normal">
+                        All Locations
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="home" id="option-two" />
+                      <Label htmlFor="home" className="font-normal">
+                        Home Games
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="away" id="option-three" />
+                      <Label htmlFor="away" className="font-normal">
+                        Away Games
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-7">
               <AccordionTrigger>Game Time</AccordionTrigger>
               <AccordionContent>
-                <div className="ml-[1px] max-w-sm space-y-4"></div>
+                <div className="ml-[1px] max-w-sm space-y-6">
+                  <div className="space-y-3">
+                    <p>Quarter</p>
+                    <ToggleGroup
+                      type="multiple"
+                      className="justify-start"
+                      onValueChange={(value) => {
+                        if (value.length > selectedQuarter.length) {
+                          const newVal = value.find((item) => {
+                            // console.log(item, selectedQuarter)
+                            return !selectedQuarter.find(
+                              (qtr) => qtr.id == item,
+                            )
+                          })
+                          if (newVal) handleQuarterSelection(newVal)
+                        } else {
+                          const newVal = selectedQuarter.find(
+                            (qtr) => !value.find((item) => qtr.id == item),
+                          )
+                          if (newVal) handleQuarterRemoval(newVal.id)
+                        }
+                      }}
+                      value={selectedQuarter?.map((q) => q.id)}
+                    >
+                      {quarters.map((quarter, key) => (
+                        <ToggleGroupItem value={quarter.id} key={key}>
+                          {quarter.name}
+                        </ToggleGroupItem>
+                      ))}
+                    </ToggleGroup>
+                  </div>
+                  <div className="space-y-3">
+                    <p>Time Left in Quarter</p>
+                    <div className="flex flex-row space-x-4">
+                      <div className="flex flex-col space-y-2">
+                        <TimePickerDemo
+                          date={startTime}
+                          setDate={setStartTime}
+                          icon={true}
+                        />
+                      </div>
+                      <div className="flex flex-col space-y-2">
+                        <TimePickerDemo date={endTime} setDate={setEndTime} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -501,6 +629,28 @@ function Home() {
                     handleClick={handleRemoveAllOppTeams}
                   >
                     <Swords />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedGameLoc && selectedGameLoc !== "" && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`${Capitalize(selectedGameLoc)}`}
+                    handleClick={handleRemoveGameLoc}
+                  >
+                    <MapPin />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedQuarter && selectedQuarter.length > 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={selectedQuarter.map((q) => q.name).join(", ") + " Q"}
+                    handleClick={handleRemoveAllQuarter}
+                  >
+                    <MapPin />
                   </DestructiveButton>
                 </li>
               )}
