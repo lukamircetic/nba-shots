@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { Minus } from "lucide-react"
 import { TimePickerInput } from "./time-picker-input"
 
 interface TimePickerDemoProps {
@@ -10,11 +9,7 @@ interface TimePickerDemoProps {
   icon?: boolean
 }
 
-export function TimePickerDemo({
-  date,
-  setDate,
-  icon = false,
-}: TimePickerDemoProps) {
+export function TimePickerDemo({ date, setDate }: TimePickerDemoProps) {
   const minuteRef = React.useRef<HTMLInputElement>(null)
   const secondRef = React.useRef<HTMLInputElement>(null)
 
@@ -38,11 +33,6 @@ export function TimePickerDemo({
           onLeftFocus={() => minuteRef.current?.focus()}
         />
       </div>
-      {icon && (
-        <div className="flex h-10 items-center">
-          <Minus className="ml-2 h-4 w-4" />
-        </div>
-      )}
     </div>
   )
 }

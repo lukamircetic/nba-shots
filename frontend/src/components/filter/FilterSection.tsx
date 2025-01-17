@@ -28,11 +28,11 @@ export function FilterSection<T extends FilterItem>({
   if (isError) return <div>{`Error fetching ${title}: ${error?.message}`}</div>
   if (items && items.length > 0) {
     return (
-      <div className="space-y-2">
-        <ScrollArea className="h-72">
+      <div className="space-y-4">
+        <ScrollArea className="h-40 sm:h-72">
           <ul>
             {items?.map((item, key) => (
-              <li key={key}>
+              <li key={key} className="w-4/5">
                 <BadgeWithButton
                   id={item.id}
                   value={item[nameKey] as string}
@@ -46,6 +46,7 @@ export function FilterSection<T extends FilterItem>({
           variant="default"
           disabled={!items || items.length == 0}
           onClick={() => onSelectAll()}
+          className="text-sm sm:text-base"
         >
           Select All
         </Button>

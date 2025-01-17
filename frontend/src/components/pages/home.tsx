@@ -26,10 +26,12 @@ import { FilterSection } from "../filter/FilterSection"
 import {
   CalendarArrowDown,
   CalendarArrowUp,
-  Clock,
+  Clock9,
   FileCode,
+  Hourglass,
   ImageDown,
   MapPin,
+  Minus,
   Pickaxe,
   Swords,
   Trophy,
@@ -228,6 +230,7 @@ function Home() {
   })
 
   // TODO: Show loading and error states for url param loading
+  // TODO: This request gets sent everytime a player gets added... fix this
   const {
     // isFetching: isParamPlayersFetching,
     // isError: isParamPlayersError,
@@ -370,25 +373,25 @@ function Home() {
   }, [isGenShots])
 
   return (
-    <div className="relative flex min-h-svh flex-col bg-background px-14">
-      <div className="flex w-full flex-col items-start justify-items-start space-y-2 py-16">
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+    <div className="relative flex min-h-svh flex-col space-y-4 bg-background px-4 sm:px-14">
+      <div className="flex w-full flex-col items-start justify-items-start space-y-0 pt-10 sm:py-16">
+        <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           nba shots
         </h1>
-        <h1 className="text-lg text-muted-foreground lg:text-xl">
+        <h1 className="text-base text-muted-foreground lg:text-xl">
           advanced shot querying and visualization
         </h1>
       </div>
-      <div className="flex flex-1 flex-row">
-        <div className="flex w-1/4 flex-col">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+      <div className="flex flex-1 flex-col space-y-6 sm:flex-row">
+        <div className="flex flex-col sm:w-1/4">
+          <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
             Filters
           </h3>
           <Accordion type="multiple">
             <AccordionItem value="item-1">
               <AccordionTrigger>Players</AccordionTrigger>
               <AccordionContent>
-                <div className="ml-[1px] max-w-xs space-y-4">
+                <div className="ml-[1px] max-w-sm space-y-4">
                   <InputWithButton
                     value={playerSearchKey}
                     setValue={setPlayerSearchKey}
@@ -546,15 +549,17 @@ function Home() {
                   </div>
                   <div className="space-y-3">
                     <p>Time Left in Quarter</p>
-                    <div className="flex flex-row space-x-4">
-                      <div className="flex flex-col space-y-2">
+                    <div className="flex flex-row items-center">
+                      <div className="">
                         <TimePickerDemo
                           date={startTimeLeft}
                           setDate={handleSelectStartTimeLeft}
-                          icon={true}
                         />
                       </div>
-                      <div className="flex flex-col space-y-2">
+                      <div className="flex h-10 items-center">
+                        <Minus className="mx-2 h-4 w-4" />
+                      </div>
+                      <div className="">
                         <TimePickerDemo
                           date={endTimeLeft}
                           setDate={handleSelectEndTimeLeft}
@@ -567,12 +572,12 @@ function Home() {
             </AccordionItem>
           </Accordion>
         </div>
-        <div className="ml-12 flex w-1/5 flex-col space-y-4">
-          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+        <div className="flex flex-col space-y-6 sm:ml-12 sm:w-1/5">
+          <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
             Selected Filters
           </h3>
           <div>
-            <ul className="space-y-1">
+            <ul className="grid grid-cols-2 gap-1">
               {selectedPlayers &&
                 (searchedPlayers?.length !== 0 ||
                   selectedPlayers.length <= 5) &&
@@ -583,7 +588,7 @@ function Home() {
                       value={player.name}
                       handleClick={handlePlayerRemoval}
                     >
-                      <UserRound size={20} />
+                      <UserRound className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 ))}
@@ -597,7 +602,7 @@ function Home() {
                       value={`%${playerSearchKey}% (${selectedPlayers.length} players)`}
                       handleClick={handleRemoveAllPlayers}
                     >
-                      <UserRound size={20} />
+                      <UserRound className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 )}
@@ -610,7 +615,7 @@ function Home() {
                       value={team.name}
                       handleClick={handleTeamRemoval}
                     >
-                      <UsersRound size={20} />
+                      <UsersRound className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 ))}
@@ -621,7 +626,7 @@ function Home() {
                     value={`All Teams`}
                     handleClick={handleRemoveAllTeams}
                   >
-                    <UsersRound size={20} />
+                    <UsersRound className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
@@ -634,7 +639,7 @@ function Home() {
                       value={season.season_years}
                       handleClick={handleSeasonRemoval}
                     >
-                      <Trophy size={20} />
+                      <Trophy className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 ))}
@@ -647,7 +652,7 @@ function Home() {
                       value="2003-2024" // TODO: make this dynamic in V2
                       handleClick={handleRemoveAllSeasons}
                     >
-                      <Trophy size={20} />
+                      <Trophy className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 )}
@@ -660,7 +665,7 @@ function Home() {
                       value={team.name}
                       handleClick={handleOppTeamRemoval}
                     >
-                      <Swords size={20} />
+                      <Swords className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 ))}
@@ -671,7 +676,7 @@ function Home() {
                     value={`All Teams`}
                     handleClick={handleRemoveAllOppTeams}
                   >
-                    <Swords size={20} />
+                    <Swords className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
@@ -682,7 +687,7 @@ function Home() {
                     value={`${Capitalize(selectedGameLoc)}`}
                     handleClick={handleRemoveGameLoc}
                   >
-                    <MapPin size={20} />
+                    <MapPin className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
@@ -690,10 +695,10 @@ function Home() {
                 <li>
                   <DestructiveButton
                     id=""
-                    value={selectedQuarter.map((q) => q.name).join(", ") + " Q"}
+                    value={selectedQuarter.map((q) => q.name).join(", ")}
                     handleClick={handleRemoveAllQuarter}
                   >
-                    <MapPin size={20} />
+                    <Clock9 className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
@@ -713,7 +718,7 @@ function Home() {
                         handleRemoveEndTimeLeft()
                       }}
                     >
-                      <Clock size={20} />
+                      <Hourglass className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 )}
@@ -721,10 +726,10 @@ function Home() {
                 <li>
                   <DestructiveButton
                     id=""
-                    value={`${format(selectedStartDate, "PPP")}`}
+                    value={`${format(selectedStartDate, "PP")}`}
                     handleClick={handleRemoveStartDate}
                   >
-                    <CalendarArrowDown size={20} />
+                    <CalendarArrowDown className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
@@ -732,16 +737,16 @@ function Home() {
                 <li>
                   <DestructiveButton
                     id=""
-                    value={format(selectedEndDate, "PPP")}
+                    value={format(selectedEndDate, "PP")}
                     handleClick={handleRemoveEndDate}
                   >
-                    <CalendarArrowUp size={20} />
+                    <CalendarArrowUp className="size-4 sm:size-5" />
                   </DestructiveButton>
                 </li>
               )}
             </ul>
           </div>
-          <div>
+          <div className="flex w-full justify-center">
             <Button
               disabled={
                 selectedPlayers?.length === 0 &&
@@ -749,16 +754,17 @@ function Home() {
                 selectedSeasons?.length === 0
               }
               variant="default"
+              size="lg"
               onClick={onGenShotsClick}
-              className="min-w-60 py-6"
+              className="self-center"
             >
               <Pickaxe /> Generate Shot Chart
             </Button>
           </div>
         </div>
-        <div className="flex-1 space-y-8">
+        <div className="flex-1 space-y-8 py-10">
           <div className="flex items-center justify-end gap-1">
-            <h3 className="flex-1 scroll-m-20 text-2xl font-semibold tracking-tight">
+            <h3 className="flex-1 scroll-m-20 text-xl font-semibold tracking-tight">
               Shot Chart
             </h3>
             <DialogShareButton disabled={shotsData === undefined} />
@@ -777,7 +783,7 @@ function Home() {
               <FileCode />
             </ButtonWithTooltip>
           </div>
-          <div className="h-[70lvh] w-full">
+          <div className="w-full">
             <div className="">
               {isShotsFetching && <div>Loading...</div>}
               {isShotsError && (

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 import React from "react"
 
 interface InputWithButtonProps {
@@ -27,8 +28,11 @@ export function InputWithButton({ value, setValue }: InputWithButtonProps) {
         onChange={(e) => {
           setInputValue(e.target.value)
         }}
+        className="text-sm sm:text-base"
       />
-      <Button type="submit">Search</Button>
+      <Button type="submit" className="w-1/5 text-sm sm:text-base">
+        <Search />
+      </Button>
     </form>
   )
 }
