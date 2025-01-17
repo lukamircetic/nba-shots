@@ -28,9 +28,9 @@ export function InputWithButton({ value, setValue }: InputWithButtonProps) {
         onChange={(e) => {
           setInputValue(e.target.value)
         }}
-        className="text-sm sm:text-base"
+        className="text-sm"
       />
-      <Button type="submit" className="w-1/5 text-sm sm:text-base">
+      <Button type="submit" className="w-1/5 text-sm">
         <Search />
       </Button>
     </form>

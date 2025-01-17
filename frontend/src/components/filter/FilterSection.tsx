@@ -46,7 +46,7 @@ export function FilterSection<T extends FilterItem>({
           variant="default"
           disabled={!items || items.length == 0}
           onClick={() => onSelectAll()}
-          className="text-sm sm:text-base"
+          className="text-sm"
         >
           Select All
         </Button>

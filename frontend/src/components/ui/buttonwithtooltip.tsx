@@ -37,6 +37,7 @@ export const ButtonWithTooltip = React.forwardRef<
             ref={ref}
             variant={variant ? variant : "outline"}
             size="icon"
+            className="sm:h-10 sm:w-10 [&_svg]:size-4 sm:[&_svg]:size-5"
             {...props}
             disabled={disabled}
           >

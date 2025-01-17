@@ -18,7 +18,7 @@ export function DestructiveButton({
   return (
     <Badge
       variant="secondary"
-      className="w-full justify-between space-x-2 py-1 pr-2 text-xs font-normal sm:min-w-64"
+      className="w-full justify-between space-x-2 py-1 pr-2 text-xs font-normal sm:text-sm lg:min-w-64"
     >
       {children}
       <p className="flex-1 text-left">{value}</p>
