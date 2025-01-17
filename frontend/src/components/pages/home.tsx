@@ -26,6 +26,7 @@ import { FilterSection } from "../filter/FilterSection"
 import {
   CalendarArrowDown,
   CalendarArrowUp,
+  Clock,
   FileCode,
   ImageDown,
   MapPin,
@@ -66,12 +67,6 @@ function Home() {
 
   const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
-  const [startTime, setStartTime] = React.useState<Date | undefined>(
-    new Date(new Date().setHours(0, 12, 0, 0)),
-  )
-  const [endTime, setEndTime] = React.useState<Date | undefined>(
-    new Date(new Date().setHours(0, 0, 0, 0)),
-  )
   const initialLoad = React.useRef<boolean>(true)
   const svgRef = React.useRef<SVGSVGElement>(null)
 
@@ -152,8 +147,6 @@ function Home() {
 
   const {
     selectedItems: selectedQuarter,
-    searchedItems: searchedQuarter,
-    handleSelectAll: handleSelectAllQuarter,
     handleSelect: handleQuarterSelection,
     handleRemove: handleQuarterRemoval,
     handleRemoveAll: handleRemoveAllQuarter,
@@ -178,6 +171,24 @@ function Home() {
   } = useStringFilterManagement({ filterName: "game_loc", defaultValue: "" })
 
   const {
+    selectedDate: startTimeLeft,
+    handleSelect: handleSelectStartTimeLeft,
+    handleRemove: handleRemoveStartTimeLeft,
+  } = useDateFilterManagement({
+    filterName: "start_time_left",
+    defaultValue: new Date(new Date().setHours(0, 12, 0, 0)),
+  })
+
+  const {
+    selectedDate: endTimeLeft,
+    handleSelect: handleSelectEndTimeLeft,
+    handleRemove: handleRemoveEndTimeLeft,
+  } = useDateFilterManagement({
+    filterName: "end_time_left",
+    defaultValue: new Date(new Date().setHours(0, 0, 0, 0)),
+  })
+
+  const {
     isFetching: isShotsFetching,
     isError: isShotsError,
     data: shotsData,
@@ -193,9 +204,13 @@ function Home() {
       selectedEndDate,
       selectedGameLoc,
       selectedQuarter,
+      startTimeLeft,
+      endTimeLeft,
     ],
     queryFn: ({ queryKey }) => {
-      const [players, teams, seasons, opps, sDate, eDate, gLoc, qtr] = queryKey
+      const [players, teams, seasons, opps, sDate, eDate, gLoc, qtr, sTL, eTL] =
+        queryKey
+      // const stMins = sTL.
       return fetchShotsWithFilters(
         players as Player[] | undefined,
         teams as Team[] | undefined,
@@ -205,6 +220,8 @@ function Home() {
         eDate as Date | undefined,
         gLoc as "home" | "away" | undefined,
         qtr as Quarter[] | undefined,
+        sTL as Date | undefined,
+        eTL as Date | undefined,
       )
     },
     enabled: false,
@@ -318,6 +335,17 @@ function Home() {
           }
         }
       }
+      if (search.start_time_left !== undefined) {
+        const [minutes, seconds] = search.start_time_left.split(":").map(Number)
+        const paramTime = new Date(new Date().setHours(0, minutes, seconds, 0))
+        handleSelectStartTimeLeft(paramTime)
+      }
+      if (search.end_time_left !== undefined) {
+        const [minutes, seconds] = search.end_time_left.split(":").map(Number)
+        const paramTime = new Date(new Date().setHours(0, minutes, seconds, 0))
+        handleSelectEndTimeLeft(paramTime)
+      }
+
       setIsGenShots(true)
     }
   }, [paramPlayersData, teamData, seasonData])
@@ -509,13 +537,16 @@ function Home() {
                     <div className="flex flex-row space-x-4">
                       <div className="flex flex-col space-y-2">
                         <TimePickerDemo
-                          date={startTime}
-                          setDate={setStartTime}
+                          date={startTimeLeft}
+                          setDate={handleSelectStartTimeLeft}
                           icon={true}
                         />
                       </div>
                       <div className="flex flex-col space-y-2">
-                        <TimePickerDemo date={endTime} setDate={setEndTime} />
+                        <TimePickerDemo
+                          date={endTimeLeft}
+                          setDate={handleSelectEndTimeLeft}
+                        />
                       </div>
                     </div>
                   </div>
@@ -604,7 +635,7 @@ function Home() {
                       value="2003-2024" // TODO: make this dynamic in V2
                       handleClick={handleRemoveAllSeasons}
                     >
-                      <Trophy />
+                      <Trophy size={20} />
                     </DestructiveButton>
                   </li>
                 )}
@@ -628,7 +659,7 @@ function Home() {
                     value={`All Teams`}
                     handleClick={handleRemoveAllOppTeams}
                   >
-                    <Swords />
+                    <Swords size={20} />
                   </DestructiveButton>
                 </li>
               )}
@@ -639,7 +670,7 @@ function Home() {
                     value={`${Capitalize(selectedGameLoc)}`}
                     handleClick={handleRemoveGameLoc}
                   >
-                    <MapPin />
+                    <MapPin size={20} />
                   </DestructiveButton>
                 </li>
               )}
@@ -650,10 +681,30 @@ function Home() {
                     value={selectedQuarter.map((q) => q.name).join(", ") + " Q"}
                     handleClick={handleRemoveAllQuarter}
                   >
-                    <MapPin />
+                    <MapPin size={20} />
                   </DestructiveButton>
                 </li>
               )}
+              {startTimeLeft &&
+                endTimeLeft &&
+                !(
+                  startTimeLeft.getMinutes() === 12 &&
+                  endTimeLeft.getMinutes() === 0 &&
+                  endTimeLeft.getSeconds() === 0
+                ) && (
+                  <li>
+                    <DestructiveButton
+                      id=""
+                      value={`${format(startTimeLeft, "mm:ss")} - ${format(endTimeLeft, "mm:ss")}`}
+                      handleClick={() => {
+                        handleRemoveStartTimeLeft()
+                        handleRemoveEndTimeLeft()
+                      }}
+                    >
+                      <Clock size={20} />
+                    </DestructiveButton>
+                  </li>
+                )}
               {selectedStartDate && (
                 <li>
                   <DestructiveButton
@@ -661,7 +712,7 @@ function Home() {
                     value={`${format(selectedStartDate, "PPP")}`}
                     handleClick={handleRemoveStartDate}
                   >
-                    <CalendarArrowDown />
+                    <CalendarArrowDown size={20} />
                   </DestructiveButton>
                 </li>
               )}
@@ -672,7 +723,7 @@ function Home() {
                     value={format(selectedEndDate, "PPP")}
                     handleClick={handleRemoveEndDate}
                   >
-                    <CalendarArrowUp />
+                    <CalendarArrowUp size={20} />
                   </DestructiveButton>
                 </li>
               )}

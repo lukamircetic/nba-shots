@@ -120,6 +120,8 @@ export async function fetchShotsWithFilters(
   eDate?: Date,
   gLoc?: "home" | "away",
   qtr?: Quarter[],
+  sTL?: Date | undefined,
+  eTL?: Date | undefined,
 ) {
   let queryString = "http://localhost:8080/shots" + "?"
   let filters = {
@@ -131,6 +133,8 @@ export async function fetchShotsWithFilters(
     end_game_date: eDate ? format(eDate, "yyyy-MM-dd") : undefined,
     game_location: gLoc ? gLoc : undefined,
     quarter: qtr ? createIdFilterString(qtr) : undefined,
+    start_time_left: sTL ? format(sTL, "mm:ss") : undefined,
+    end_time_left: eTL ? format(eTL, "mm:ss") : undefined,
   }
 
   Object.entries(filters).forEach(([key, value]) => {

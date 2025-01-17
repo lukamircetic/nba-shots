@@ -192,7 +192,7 @@ func ShotCtx(next http.Handler) http.Handler {
 		endTimeLeftParams := r.URL.Query().Get("end_time_left")
 		shotArgs.EndTimeLeftSecs = -1
 		if endTimeLeftParams != "" {
-			log.Println("end time left passed in:", startTimeLeftParams)
+			log.Println("end time left passed in:", endTimeLeftParams)
 			endTimeLeft, err := parseClockTimeLeftToSecs(endTimeLeftParams)
 			if err != nil {
 				render.Render(w, r, ErrInvalidRequest(err))
@@ -218,10 +218,10 @@ func ShotCtx(next http.Handler) http.Handler {
 
 func parseClockTimeLeftToSecs(t string) (int, error) {
 	// Expecting format: M:S
-	re := regexp.MustCompile("^([0-9]|1[0-2]):([0-5][0-9])$")
+	re := regexp.MustCompile("^(0?[0-9]|1[0-2]):([0-5][0-9])$")
 
 	if !re.MatchString(t) {
-		return 0, fmt.Errorf("invalid request time left format for")
+		return 0, fmt.Errorf("invalid request time left format")
 	}
 
 	comps := strings.Split(t, ":")
