@@ -29,7 +29,7 @@ export function FilterSection<T extends FilterItem>({
   if (items && items.length > 0) {
     return (
       <div className="space-y-4">
-        <ScrollArea className="h-40 sm:h-72">
+        <ScrollArea className="sm:40 h-40 md:h-52 lg:h-52 xl:h-72">
           <ul>
             {items?.map((item, key) => (
               <li key={key} className="w-4/5">

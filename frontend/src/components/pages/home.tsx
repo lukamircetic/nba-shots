@@ -373,8 +373,8 @@ function Home() {
   }, [isGenShots])
 
   return (
-    <div className="relative flex min-h-svh flex-col space-y-6 bg-background px-4 lg:px-14">
-      <div className="flex w-full flex-col items-start justify-items-start space-y-0 pt-10 lg:py-16">
+    <div className="relative flex min-h-svh flex-col space-y-6 bg-background px-4 lg:space-y-10 lg:px-14">
+      <div className="flex w-full flex-col items-start justify-items-start space-y-0 pt-10 lg:pt-16">
         <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           nba shots
         </h1>
@@ -383,8 +383,8 @@ function Home() {
         </h1>
       </div>
       <div className="m:flex-row flex flex-1 flex-col space-y-6">
-        <div className="grid w-full grid-cols-1 gap-4 space-y-6 sm:grid-cols-2 sm:space-y-0 md:grid-cols-5">
-          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-2 lg:w-1/4">
+        <div className="grid w-full grid-cols-1 gap-4 space-y-6 sm:grid-cols-2 sm:space-y-0 md:grid-cols-5 lg:gap-10">
+          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-2">
             <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
               Filters
             </h3>
@@ -586,7 +586,7 @@ function Home() {
               </AccordionItem>
             </Accordion>
           </div>
-          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-3 lg:ml-12 lg:w-1/5">
+          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-3">
             <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
               Selected Filters
             </h3>
@@ -805,7 +805,7 @@ function Home() {
                 <div>{`Error fetching shots: ${shotsError.message}`}</div>
               )}
               {
-                <div className="rounded-md border p-2">
+                <div className="aspect-square max-h-[85vh] w-full">
                   <BasketballCourt ref={svgRef} shots={shotsData} />
                 </div>
               }

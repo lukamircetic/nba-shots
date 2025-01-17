@@ -118,7 +118,7 @@ const BasketballCourt = React.forwardRef<SVGSVGElement, BasketballCourtProps>(
           x2={25 * SCALE}
           y2={COURT_Y}
           stroke="black"
-          strokeWidth="0.25"
+          strokeWidth="0.1"
         />
         <line
           className={lineClassName}
@@ -127,7 +127,7 @@ const BasketballCourt = React.forwardRef<SVGSVGElement, BasketballCourtProps>(
           x2={-25 * SCALE}
           y2={COURT_Y}
           stroke="black"
-          strokeWidth="0.25"
+          strokeWidth="0.1"
         />
         {/* Three point line */}
         <path
