@@ -270,7 +270,19 @@ function Home() {
 
   const handleSaveData = () => {
     if (shotsData) {
-      saveAsJSON(selectedPlayers, selectedTeams, selectedSeasons, shotsData)
+      saveAsJSON(
+        shotsData,
+        selectedPlayers,
+        selectedTeams,
+        selectedSeasons,
+        selectedOppTeams,
+        selectedStartDate,
+        selectedEndDate,
+        selectedGameLoc,
+        selectedQuarter,
+        startTimeLeft,
+        endTimeLeft,
+      )
     }
   }
 
