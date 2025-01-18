@@ -43,13 +43,22 @@ type SeasonResponse = {
   elapsed: number
 }
 
-type ShotResponse = {
+type Shot = {
   id: number
   loc_x: number
   loc_y: number
   shot_made: boolean
   shot_type: string
-  elapsed: number
+}
+
+type ShotResponse = {
+  total_made_shots: number
+  total_missed_shots: number
+  made_2pt_shots: number
+  missed_2pt_shots: number
+  made_3pt_shots: number
+  missed_3pt_shots: number
+  shots: Shot[]
 }
 
 export async function fetchPlayersByName(name: string) {
@@ -144,19 +153,26 @@ export async function fetchShotsWithFilters(
   })
 
   const response = await fetch(queryString)
-  const data: ShotResponse[] = await response.json()
+  const data: ShotResponse = await response.json()
 
   if (!response.ok) {
     throw new Error("Failed to fetch teams")
   }
-
-  return data.map((shot) => ({
-    id: shot.id.toString(),
-    locX: shot.loc_x,
-    locY: shot.loc_y,
-    shotMade: shot.shot_made,
-    shotType: shot.shot_type,
-  }))
+  return {
+    totalMadeShots: data.total_made_shots,
+    totalMissedShots: data.total_missed_shots,
+    made2PtShots: data.made_2pt_shots,
+    missed2PtShots: data.missed_2pt_shots,
+    made3PtShots: data.made_3pt_shots,
+    missed3PtShots: data.missed_3pt_shots,
+    shots: data.shots.map((shot) => ({
+      id: shot.id.toString(),
+      locX: shot.loc_x,
+      locY: shot.loc_y,
+      shotMade: shot.shot_made,
+      shotType: shot.shot_type,
+    }))
+  }
 }
 
 function createIdFilterString(arr: HasId[]) {

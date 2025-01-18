@@ -16,13 +16,48 @@ import (
 
 type shotsContextKey string
 
+type shotAggregates struct {
+	TotalMadeShots   int64 `json:"total_made_shots"`
+	TotalMissedShots int64 `json:"total_missed_shots"`
+	Made2PtShots     int64 `json:"made_2pt_shots"`
+	Missed2PtShots   int64 `json:"missed_2pt_shots"`
+	Made3PtShots     int64 `json:"made_3pt_shots"`
+	Missed3PtShots   int64 `json:"missed_3pt_shots"`
+}
+
 type ShotResponse struct {
-	*types.ReturnShot
-	Elapsed int64 `json:"elapsed"`
+	shotAggregates
+	Shots []types.ReturnShot `json:"shots"`
 }
 
 const shotArgsKey shotsContextKey = "shotArgs"
-const MINS_IN_A_QUARTER int = 12
+const (
+	MINS_IN_A_QUARTER int    = 12
+	TWO_PT_SHOT       string = "2PT Field Goal"
+	THREE_PT_SHOT     string = "3PT Field Goal"
+)
+
+func (s *Server) getShotAggregates(shots *[]types.ReturnShot) shotAggregates {
+	aggs := shotAggregates{}
+	for _, s := range *shots {
+		if s.ShotMade {
+			aggs.TotalMadeShots++
+			if s.ShotType == TWO_PT_SHOT {
+				aggs.Made2PtShots++
+			} else {
+				aggs.Made3PtShots++
+			}
+		} else {
+			aggs.TotalMissedShots++
+			if s.ShotType == TWO_PT_SHOT {
+				aggs.Missed2PtShots++
+			} else {
+				aggs.Missed3PtShots++
+			}
+		}
+	}
+	return aggs
+}
 
 func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 	// 1 - parse the query args into a types.RequestShotParams variable
@@ -37,31 +72,26 @@ func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 3 - send the shots back to the client
-	err = render.RenderList(w, r, NewShotListResponse(&shots))
+	// 3 - calc shot stat aggregates
+	shotAggs := s.getShotAggregates(&shots)
+
+	// 4 - send the shots back to the client
+	err = render.Render(w, r, NewShotResponse(&shotAggs, &shots))
 	if err != nil {
 		render.Render(w, r, ErrRender(err))
 		return
 	}
 }
 
-func NewShotListResponse(shots *[]types.ReturnShot) []render.Renderer {
-	list := []render.Renderer{}
-	for _, shot := range *shots {
-		list = append(list, NewShotResponse(&shot))
-	}
-	return list
-}
-
-func NewShotResponse(shot *types.ReturnShot) *ShotResponse {
+func NewShotResponse(shotAggs *shotAggregates, shots *[]types.ReturnShot) *ShotResponse {
 	resp := &ShotResponse{
-		ReturnShot: shot,
+		shotAggregates: *shotAggs,
+		Shots:          *shots,
 	}
 	return resp
 }
 
 func (rd *ShotResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	rd.Elapsed = 10
 	return nil
 }
 

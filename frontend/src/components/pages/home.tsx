@@ -53,6 +53,15 @@ import { Capitalize } from "@/api/helpers"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { TimePickerDemo } from "../ui/time-picker"
 import { LoadingSpinner } from "../ui/loading-spinner"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table"
 
 const quarters = [
   { id: "1", name: "1st" },
@@ -273,9 +282,9 @@ function Home() {
   }
 
   const handleSaveData = () => {
-    if (shotsData) {
+    if (shotsData?.shots) {
       saveAsJSON(
-        shotsData,
+        shotsData.shots,
         selectedPlayers,
         selectedTeams,
         selectedSeasons,
@@ -822,10 +831,49 @@ function Home() {
               <div>{`Error fetching shots: ${shotsError.message}`}</div>
             ) : (
               <div className="aspect-square max-h-[85vh] w-full">
-                <BasketballCourt ref={svgRef} shots={shotsData} />
+                <BasketballCourt ref={svgRef} shots={shotsData?.shots} />
               </div>
             )}
           </div>
+          <Table>
+            <TableCaption>The stats for the queried shots.</TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="">Shot Type</TableHead>
+                <TableHead>Shots Made</TableHead>
+                <TableHead>Shots Missed</TableHead>
+                <TableHead>Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">2PT FG</TableCell>
+                <TableCell>{shotsData?.made2PtShots}</TableCell>
+                <TableCell>{shotsData?.missed2PtShots}</TableCell>
+                <TableCell>
+                  {shotsData
+                    ? shotsData?.missed2PtShots + shotsData?.made2PtShots
+                    : 0}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">3PT FG</TableCell>
+                <TableCell>{shotsData?.made3PtShots}</TableCell>
+                <TableCell>{shotsData?.missed3PtShots}</TableCell>
+                <TableCell>
+                  {shotsData
+                    ? shotsData.made3PtShots + shotsData.missed3PtShots
+                    : 0}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">All FG</TableCell>
+                <TableCell>{shotsData?.totalMadeShots}</TableCell>
+                <TableCell>{shotsData?.totalMissedShots}</TableCell>
+                <TableCell>{shotsData ? shotsData.shots.length : 0}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>
