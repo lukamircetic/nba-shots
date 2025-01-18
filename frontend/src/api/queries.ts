@@ -158,13 +158,28 @@ export async function fetchShotsWithFilters(
   if (!response.ok) {
     throw new Error("Failed to fetch teams")
   }
+
+  const pctTotal = data.shots.length > 0 ? data.total_made_shots / data.shots.length * 100 : 0
+
+  const total2PtShots = data.made_2pt_shots + data.missed_2pt_shots
+  const pct2Pt = total2PtShots > 0 ? data.made_2pt_shots / (data.made_2pt_shots + data.missed_2pt_shots) * 100: 0
+
+  const total3PtShots = data.made_3pt_shots + data.missed_3pt_shots
+  const pct3Pt = total3PtShots > 0 ? data.made_3pt_shots / (data.made_3pt_shots + data.missed_3pt_shots) * 100: 0
+
   return {
     totalMadeShots: data.total_made_shots,
     totalMissedShots: data.total_missed_shots,
+    totalShots: data.shots.length,
+    pctTotal: Math.round(pctTotal),
     made2PtShots: data.made_2pt_shots,
     missed2PtShots: data.missed_2pt_shots,
+    total2PtShots: total2PtShots,
+    pct2Pt: Math.round(pct2Pt),
     made3PtShots: data.made_3pt_shots,
     missed3PtShots: data.missed_3pt_shots,
+    total3PtShots: total3PtShots,
+    pct3Pt: Math.round(pct3Pt),
     shots: data.shots.map((shot) => ({
       id: shot.id.toString(),
       locX: shot.loc_x,
