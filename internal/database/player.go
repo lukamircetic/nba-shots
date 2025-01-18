@@ -23,7 +23,7 @@ func (s *service) GetPlayersByName(playerName string) ([]types.Player, error) {
 	log.Println("Querying database for playerName", playerName)
 
 	players := []types.Player{}
-	query := `SELECT id, name FROM player WHERE name like $1`
+	query := `SELECT id, name FROM player WHERE name ilike $1`
 
 	rows, err := s.db.Query(context.Background(), query, playerName)
 
