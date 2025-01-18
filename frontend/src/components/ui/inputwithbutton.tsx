@@ -30,8 +30,11 @@ export function InputWithButton({ value, setValue }: InputWithButtonProps) {
         }}
         className="text-sm"
       />
-      <Button type="submit" className="w-1/5 text-sm">
-        <Search />
+      <Button
+        type="submit"
+        className="w-1/5 text-sm [&_svg]:size-4 lg:[&_svg]:size-5"
+      >
+        <Search className="" />
       </Button>
     </form>
   )

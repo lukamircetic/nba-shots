@@ -373,7 +373,7 @@ function Home() {
   }, [isGenShots])
 
   return (
-    <div className="relative flex min-h-svh flex-col space-y-6 bg-background px-4 lg:space-y-10 lg:px-14">
+    <div className="relative mx-auto flex min-h-svh max-w-4xl flex-col space-y-6 bg-background px-4 lg:space-y-10 lg:px-14 2xl:max-w-[1536px]">
       <div className="flex w-full flex-col items-start justify-items-start space-y-0 pt-10 lg:pt-16">
         <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           nba shots
@@ -382,404 +382,402 @@ function Home() {
           advanced shot querying and visualization
         </h1>
       </div>
-      <div className="m:flex-row flex flex-1 flex-col space-y-6">
-        <div className="grid w-full grid-cols-1 gap-4 space-y-6 sm:grid-cols-2 sm:space-y-0 md:grid-cols-5 lg:gap-10">
-          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-2">
-            <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
-              Filters
-            </h3>
-            <Accordion type="multiple">
-              <AccordionItem value="item-1">
-                <AccordionTrigger>Players</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <InputWithButton
-                      value={playerSearchKey}
-                      setValue={setPlayerSearchKey}
-                    />
-                    <FilterSection
-                      title="Players"
-                      items={searchedPlayers}
-                      isLoading={isPlayerPending}
-                      isError={isPlayerError}
-                      error={isPlayerError ? playerError : null}
-                      onSelect={handlePlayerSelection}
-                      onSelectAll={handleSelectAllPlayers}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2">
-                <AccordionTrigger>Teams</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <FilterSection
-                      title="Teams"
-                      items={searchedTeams}
-                      isLoading={isTeamPending}
-                      isError={isTeamError}
-                      error={isTeamError ? teamError : null}
-                      onSelect={handleTeamSelection}
-                      onSelectAll={handleSelectAllTeams}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger>Seasons</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <FilterSection
-                      title="Seasons"
-                      items={searchedSeasons}
-                      isLoading={isSeasonPending}
-                      isError={isSeasonError}
-                      error={isSeasonError ? seasonError : null}
-                      onSelect={handleSeasonSelection}
-                      onSelectAll={handleSelectAllSeasons}
-                      nameKey="season_years"
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-4">
-                <AccordionTrigger>Opposing Team</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <FilterSection
-                      title="Opposing Team"
-                      items={searchedOppTeams}
-                      isLoading={isTeamPending}
-                      isError={isTeamError}
-                      error={isTeamError ? teamError : null}
-                      onSelect={handleOppTeamSelection}
-                      onSelectAll={handleSelectAllOppTeams}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-5">
-                <AccordionTrigger>Game Date</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <p className="text-sm sm:text-base">Start Date</p>
-                    <DatePicker
-                      date={selectedStartDate}
-                      setDate={handleSelectStartDate}
-                      defaultDate={
-                        selectedEndDate ? selectedEndDate : new Date(2024, 0)
-                      }
-                      after={selectedEndDate}
-                    />
-                    <p className="text-sm sm:text-base">End Date</p>
-                    <DatePicker
-                      date={selectedEndDate}
-                      setDate={handleSelectEndDate}
-                      defaultDate={
-                        selectedStartDate
-                          ? selectedStartDate
-                          : new Date(2024, 0)
-                      }
-                      before={selectedStartDate}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-6">
-                <AccordionTrigger>Game Location</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-4">
-                    <RadioGroup
-                      defaultValue=""
-                      value={selectedGameLoc}
-                      onValueChange={handleSelectGameLoc}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="" id="option-one" />
-                        <Label
-                          htmlFor="all-locations"
-                          className="font-normal sm:text-base"
-                        >
-                          All Locations
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="home" id="option-two" />
-                        <Label
-                          htmlFor="home"
-                          className="font-normal sm:text-base"
-                        >
-                          Home Games
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="away" id="option-three" />
-                        <Label
-                          htmlFor="away"
-                          className="font-normal sm:text-base"
-                        >
-                          Away Games
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-7">
-                <AccordionTrigger>Game Time</AccordionTrigger>
-                <AccordionContent>
-                  <div className="ml-[1px] max-w-sm space-y-6">
-                    <div className="space-y-3">
-                      <p className="text-sm sm:text-base">Quarter</p>
-                      <ToggleGroup
-                        type="multiple"
-                        className="grid grid-flow-row grid-cols-8 grid-rows-1 justify-start gap-1 sm:grid-flow-row sm:grid-cols-4 sm:grid-rows-2"
-                        onValueChange={(value) => {
-                          if (value.length > selectedQuarter.length) {
-                            const newVal = value.find((item) => {
-                              // console.log(item, selectedQuarter)
-                              return !selectedQuarter.find(
-                                (qtr) => qtr.id == item,
-                              )
-                            })
-                            if (newVal) handleQuarterSelection(newVal)
-                          } else {
-                            const newVal = selectedQuarter.find(
-                              (qtr) => !value.find((item) => qtr.id == item),
+      <div className="grid w-full grid-cols-1 gap-4 space-y-6 sm:grid-cols-2 sm:space-y-0 md:grid-cols-5 lg:gap-10 2xl:grid-flow-col 2xl:grid-cols-12 2xl:gap-20">
+        <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-2 2xl:col-span-3">
+          <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl lg:text-3xl">
+            Filters
+          </h3>
+          <Accordion type="multiple">
+            <AccordionItem value="item-1">
+              <AccordionTrigger>Players</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <InputWithButton
+                    value={playerSearchKey}
+                    setValue={setPlayerSearchKey}
+                  />
+                  <FilterSection
+                    title="Players"
+                    items={searchedPlayers}
+                    isLoading={isPlayerPending}
+                    isError={isPlayerError}
+                    error={isPlayerError ? playerError : null}
+                    onSelect={handlePlayerSelection}
+                    onSelectAll={handleSelectAllPlayers}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+              <AccordionTrigger>Teams</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <FilterSection
+                    title="Teams"
+                    items={searchedTeams}
+                    isLoading={isTeamPending}
+                    isError={isTeamError}
+                    error={isTeamError ? teamError : null}
+                    onSelect={handleTeamSelection}
+                    onSelectAll={handleSelectAllTeams}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+              <AccordionTrigger>Seasons</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <FilterSection
+                    title="Seasons"
+                    items={searchedSeasons}
+                    isLoading={isSeasonPending}
+                    isError={isSeasonError}
+                    error={isSeasonError ? seasonError : null}
+                    onSelect={handleSeasonSelection}
+                    onSelectAll={handleSelectAllSeasons}
+                    nameKey="season_years"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-4">
+              <AccordionTrigger>Opposing Team</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <FilterSection
+                    title="Opposing Team"
+                    items={searchedOppTeams}
+                    isLoading={isTeamPending}
+                    isError={isTeamError}
+                    error={isTeamError ? teamError : null}
+                    onSelect={handleOppTeamSelection}
+                    onSelectAll={handleSelectAllOppTeams}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-5">
+              <AccordionTrigger>Game Date</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <p className="text-sm sm:text-base">Start Date</p>
+                  <DatePicker
+                    date={selectedStartDate}
+                    setDate={handleSelectStartDate}
+                    defaultDate={
+                      selectedEndDate ? selectedEndDate : new Date(2024, 0)
+                    }
+                    after={selectedEndDate}
+                  />
+                  <p className="text-sm sm:text-base">End Date</p>
+                  <DatePicker
+                    date={selectedEndDate}
+                    setDate={handleSelectEndDate}
+                    defaultDate={
+                      selectedStartDate ? selectedStartDate : new Date(2024, 0)
+                    }
+                    before={selectedStartDate}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-6">
+              <AccordionTrigger>Game Location</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-4">
+                  <RadioGroup
+                    defaultValue=""
+                    value={selectedGameLoc}
+                    onValueChange={handleSelectGameLoc}
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="" id="option-one" />
+                      <Label
+                        htmlFor="all-locations"
+                        className="font-normal sm:text-base"
+                      >
+                        All Locations
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="home" id="option-two" />
+                      <Label
+                        htmlFor="home"
+                        className="font-normal sm:text-base"
+                      >
+                        Home Games
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="away" id="option-three" />
+                      <Label
+                        htmlFor="away"
+                        className="font-normal sm:text-base"
+                      >
+                        Away Games
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-7">
+              <AccordionTrigger>Game Time</AccordionTrigger>
+              <AccordionContent>
+                <div className="ml-[1px] max-w-sm space-y-6">
+                  <div className="space-y-3">
+                    <p className="text-sm sm:text-base">Quarter</p>
+                    <ToggleGroup
+                      type="multiple"
+                      className="grid grid-flow-row grid-cols-8 grid-rows-1 justify-start gap-1 sm:grid-flow-row sm:grid-cols-4 sm:grid-rows-2"
+                      onValueChange={(value) => {
+                        if (value.length > selectedQuarter.length) {
+                          const newVal = value.find((item) => {
+                            // console.log(item, selectedQuarter)
+                            return !selectedQuarter.find(
+                              (qtr) => qtr.id == item,
                             )
-                            if (newVal) handleQuarterRemoval(newVal.id)
-                          }
-                        }}
-                        value={selectedQuarter?.map((q) => q.id)}
-                      >
-                        {quarters.map((quarter, key) => (
-                          <ToggleGroupItem value={quarter.id} key={key}>
-                            {quarter.name}
-                          </ToggleGroupItem>
-                        ))}
-                      </ToggleGroup>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-sm sm:text-base">
-                        Time Left in Quarter
-                      </p>
-                      <div className="flex flex-row items-center">
-                        <div className="">
-                          <TimePickerDemo
-                            date={startTimeLeft}
-                            setDate={handleSelectStartTimeLeft}
-                          />
-                        </div>
-                        <div className="flex h-10 items-center">
-                          <Minus className="mx-2 h-4 w-4" />
-                        </div>
-                        <div className="">
-                          <TimePickerDemo
-                            date={endTimeLeft}
-                            setDate={handleSelectEndTimeLeft}
-                          />
-                        </div>
+                          })
+                          if (newVal) handleQuarterSelection(newVal)
+                        } else {
+                          const newVal = selectedQuarter.find(
+                            (qtr) => !value.find((item) => qtr.id == item),
+                          )
+                          if (newVal) handleQuarterRemoval(newVal.id)
+                        }
+                      }}
+                      value={selectedQuarter?.map((q) => q.id)}
+                    >
+                      {quarters.map((quarter, key) => (
+                        <ToggleGroupItem
+                          value={quarter.id}
+                          key={key}
+                          className="lg:text-base"
+                        >
+                          {quarter.name}
+                        </ToggleGroupItem>
+                      ))}
+                    </ToggleGroup>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="text-sm sm:text-base">Time Left in Quarter</p>
+                    <div className="flex flex-row items-center">
+                      <div className="">
+                        <TimePickerDemo
+                          date={startTimeLeft}
+                          setDate={handleSelectStartTimeLeft}
+                        />
+                      </div>
+                      <div className="flex h-10 items-center">
+                        <Minus className="mx-2 h-4 w-4" />
+                      </div>
+                      <div className="">
+                        <TimePickerDemo
+                          date={endTimeLeft}
+                          setDate={handleSelectEndTimeLeft}
+                        />
                       </div>
                     </div>
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </div>
-          <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-3">
-            <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
-              Selected Filters
-            </h3>
-            <div>
-              <ul className="grid grid-cols-2 gap-1 sm:grid-cols-1 md:grid-cols-2">
-                {selectedPlayers &&
-                  (searchedPlayers?.length !== 0 ||
-                    selectedPlayers.length <= 5) &&
-                  selectedPlayers.map((player, key) => (
-                    <li key={key}>
-                      <DestructiveButton
-                        id={player.id}
-                        value={player.name}
-                        handleClick={handlePlayerRemoval}
-                      >
-                        <UserRound className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  ))}
-                {/* basically if you select all, and theres more than 5 players it shows a summary of the search key instead of all the players */}
-                {selectedPlayers &&
-                  selectedPlayers.length > 5 &&
-                  searchedPlayers?.length === 0 && (
-                    <li>
-                      <DestructiveButton
-                        id=""
-                        value={`%${playerSearchKey}% (${selectedPlayers.length} players)`}
-                        handleClick={handleRemoveAllPlayers}
-                      >
-                        <UserRound className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  )}
-                {selectedTeams &&
-                  searchedTeams?.length !== 0 &&
-                  selectedTeams.map((team, key) => (
-                    <li key={key}>
-                      <DestructiveButton
-                        id={team.id}
-                        value={team.name}
-                        handleClick={handleTeamRemoval}
-                      >
-                        <UsersRound className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  ))}
-                {selectedTeams && searchedTeams?.length === 0 && (
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+        <div className="flex flex-col space-y-6 sm:col-span-1 md:col-span-3 2xl:col-span-3">
+          <h3 className="scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl lg:text-3xl">
+            Selected Filters
+          </h3>
+          <div>
+            <ul className="grid grid-cols-2 gap-1 sm:grid-cols-1 md:grid-cols-2 2xl:grid-cols-1">
+              {selectedPlayers &&
+                (searchedPlayers?.length !== 0 ||
+                  selectedPlayers.length <= 5) &&
+                selectedPlayers.map((player, key) => (
+                  <li key={key}>
+                    <DestructiveButton
+                      id={player.id}
+                      value={player.name}
+                      handleClick={handlePlayerRemoval}
+                    >
+                      <UserRound className="size-4 sm:size-5" />
+                    </DestructiveButton>
+                  </li>
+                ))}
+              {/* basically if you select all, and theres more than 5 players it shows a summary of the search key instead of all the players */}
+              {selectedPlayers &&
+                selectedPlayers.length > 5 &&
+                searchedPlayers?.length === 0 && (
                   <li>
                     <DestructiveButton
                       id=""
-                      value={`All Teams`}
-                      handleClick={handleRemoveAllTeams}
+                      value={`%${playerSearchKey}% (${selectedPlayers.length} players)`}
+                      handleClick={handleRemoveAllPlayers}
+                    >
+                      <UserRound className="size-4 sm:size-5" />
+                    </DestructiveButton>
+                  </li>
+                )}
+              {selectedTeams &&
+                searchedTeams?.length !== 0 &&
+                selectedTeams.map((team, key) => (
+                  <li key={key}>
+                    <DestructiveButton
+                      id={team.id}
+                      value={team.name}
+                      handleClick={handleTeamRemoval}
                     >
                       <UsersRound className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
-                )}
-                {selectedSeasons &&
-                  searchedSeasons?.length !== 0 &&
-                  selectedSeasons.map((season, key) => (
-                    <li key={key}>
-                      <DestructiveButton
-                        id={season.id}
-                        value={season.season_years}
-                        handleClick={handleSeasonRemoval}
-                      >
-                        <Trophy className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  ))}
-                {selectedSeasons &&
-                  selectedSeasons.length > 0 &&
-                  searchedSeasons?.length === 0 && (
-                    <li>
-                      <DestructiveButton
-                        id=""
-                        value="2003-2024" // TODO: make this dynamic in V2
-                        handleClick={handleRemoveAllSeasons}
-                      >
-                        <Trophy className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  )}
-                {selectedOppTeams &&
-                  selectedOppTeams?.length !== 0 &&
-                  selectedOppTeams.map((team, key) => (
-                    <li key={key}>
-                      <DestructiveButton
-                        id={team.id}
-                        value={team.name}
-                        handleClick={handleOppTeamRemoval}
-                      >
-                        <Swords className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  ))}
-                {selectedOppTeams && searchedOppTeams?.length === 0 && (
+                ))}
+              {selectedTeams && searchedTeams?.length === 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`All Teams`}
+                    handleClick={handleRemoveAllTeams}
+                  >
+                    <UsersRound className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedSeasons &&
+                searchedSeasons?.length !== 0 &&
+                selectedSeasons.map((season, key) => (
+                  <li key={key}>
+                    <DestructiveButton
+                      id={season.id}
+                      value={season.season_years}
+                      handleClick={handleSeasonRemoval}
+                    >
+                      <Trophy className="size-4 sm:size-5" />
+                    </DestructiveButton>
+                  </li>
+                ))}
+              {selectedSeasons &&
+                selectedSeasons.length > 0 &&
+                searchedSeasons?.length === 0 && (
                   <li>
                     <DestructiveButton
                       id=""
-                      value={`All Teams`}
-                      handleClick={handleRemoveAllOppTeams}
+                      value="2003-2024" // TODO: make this dynamic in V2
+                      handleClick={handleRemoveAllSeasons}
+                    >
+                      <Trophy className="size-4 sm:size-5" />
+                    </DestructiveButton>
+                  </li>
+                )}
+              {selectedOppTeams &&
+                selectedOppTeams?.length !== 0 &&
+                selectedOppTeams.map((team, key) => (
+                  <li key={key}>
+                    <DestructiveButton
+                      id={team.id}
+                      value={team.name}
+                      handleClick={handleOppTeamRemoval}
                     >
                       <Swords className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
-                )}
-                {selectedGameLoc && selectedGameLoc !== "" && (
+                ))}
+              {selectedOppTeams && searchedOppTeams?.length === 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`All Teams`}
+                    handleClick={handleRemoveAllOppTeams}
+                  >
+                    <Swords className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedGameLoc && selectedGameLoc !== "" && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`${Capitalize(selectedGameLoc)}`}
+                    handleClick={handleRemoveGameLoc}
+                  >
+                    <MapPin className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedQuarter && selectedQuarter.length > 0 && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={selectedQuarter.map((q) => q.name).join(", ")}
+                    handleClick={handleRemoveAllQuarter}
+                  >
+                    <Clock9 className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+              {startTimeLeft &&
+                endTimeLeft &&
+                !(
+                  startTimeLeft.getMinutes() === 12 &&
+                  endTimeLeft.getMinutes() === 0 &&
+                  endTimeLeft.getSeconds() === 0
+                ) && (
                   <li>
                     <DestructiveButton
                       id=""
-                      value={`${Capitalize(selectedGameLoc)}`}
-                      handleClick={handleRemoveGameLoc}
+                      value={`${format(startTimeLeft, "mm:ss")} - ${format(endTimeLeft, "mm:ss")}`}
+                      handleClick={() => {
+                        handleRemoveStartTimeLeft()
+                        handleRemoveEndTimeLeft()
+                      }}
                     >
-                      <MapPin className="size-4 sm:size-5" />
+                      <Hourglass className="size-4 sm:size-5" />
                     </DestructiveButton>
                   </li>
                 )}
-                {selectedQuarter && selectedQuarter.length > 0 && (
-                  <li>
-                    <DestructiveButton
-                      id=""
-                      value={selectedQuarter.map((q) => q.name).join(", ")}
-                      handleClick={handleRemoveAllQuarter}
-                    >
-                      <Clock9 className="size-4 sm:size-5" />
-                    </DestructiveButton>
-                  </li>
-                )}
-                {startTimeLeft &&
-                  endTimeLeft &&
-                  !(
-                    startTimeLeft.getMinutes() === 12 &&
-                    endTimeLeft.getMinutes() === 0 &&
-                    endTimeLeft.getSeconds() === 0
-                  ) && (
-                    <li>
-                      <DestructiveButton
-                        id=""
-                        value={`${format(startTimeLeft, "mm:ss")} - ${format(endTimeLeft, "mm:ss")}`}
-                        handleClick={() => {
-                          handleRemoveStartTimeLeft()
-                          handleRemoveEndTimeLeft()
-                        }}
-                      >
-                        <Hourglass className="size-4 sm:size-5" />
-                      </DestructiveButton>
-                    </li>
-                  )}
-                {selectedStartDate && (
-                  <li>
-                    <DestructiveButton
-                      id=""
-                      value={`${format(selectedStartDate, "PP")}`}
-                      handleClick={handleRemoveStartDate}
-                    >
-                      <CalendarArrowDown className="size-4 sm:size-5" />
-                    </DestructiveButton>
-                  </li>
-                )}
-                {selectedEndDate && (
-                  <li>
-                    <DestructiveButton
-                      id=""
-                      value={format(selectedEndDate, "PP")}
-                      handleClick={handleRemoveEndDate}
-                    >
-                      <CalendarArrowUp className="size-4 sm:size-5" />
-                    </DestructiveButton>
-                  </li>
-                )}
-              </ul>
-            </div>
-            <div className="flex w-full justify-center">
-              <Button
-                disabled={
-                  selectedPlayers?.length === 0 &&
-                  selectedTeams?.length === 0 &&
-                  selectedSeasons?.length === 0
-                }
-                variant="default"
-                size="lg"
-                onClick={onGenShotsClick}
-                className="self-center"
-              >
-                <Pickaxe /> Generate Shot Chart
-              </Button>
-            </div>
+              {selectedStartDate && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={`${format(selectedStartDate, "PP")}`}
+                    handleClick={handleRemoveStartDate}
+                  >
+                    <CalendarArrowDown className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+              {selectedEndDate && (
+                <li>
+                  <DestructiveButton
+                    id=""
+                    value={format(selectedEndDate, "PP")}
+                    handleClick={handleRemoveEndDate}
+                  >
+                    <CalendarArrowUp className="size-4 sm:size-5" />
+                  </DestructiveButton>
+                </li>
+              )}
+            </ul>
+          </div>
+          <div className="flex w-full justify-center">
+            <Button
+              disabled={
+                selectedPlayers?.length === 0 &&
+                selectedTeams?.length === 0 &&
+                selectedSeasons?.length === 0
+              }
+              variant="default"
+              size="lg"
+              onClick={onGenShotsClick}
+              className="self-center lg:px-10"
+            >
+              <Pickaxe /> Generate Shot Chart
+            </Button>
           </div>
         </div>
-        <div className="flex-1 space-y-8 py-10">
+        <div className="flex-1 space-y-5 pb-10 sm:col-span-2 sm:pt-10 md:col-span-5 2xl:col-span-6 2xl:col-start-7 2xl:mt-0 2xl:py-0">
           <div className="flex items-center justify-end gap-1 sm:gap-2">
-            <h3 className="flex-1 scroll-m-20 text-xl font-semibold tracking-tight sm:text-2xl">
+            <h3 className="flex-1 scroll-m-20 self-start text-xl font-semibold tracking-tight sm:text-2xl lg:text-3xl">
               Shot Chart
             </h3>
             <DialogShareButton disabled={shotsData === undefined} />
