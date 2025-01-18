@@ -254,6 +254,7 @@ function Home() {
       if (playersString === undefined) return []
       return fetchPlayersByIds(playersString)
     },
+    enabled: initialLoad.current,
   })
 
   const onGenShotsClick = () => {
