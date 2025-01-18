@@ -19,7 +19,6 @@ import {
   Team,
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
-import BasketballCourt from "../viz/basketball-court"
 import { DestructiveButton } from "../ui/destructivebutton"
 import { useFilterManagement } from "../filter/useFilterManagement"
 import { FilterSection } from "../filter/FilterSection"
@@ -40,7 +39,6 @@ import {
 } from "lucide-react"
 import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
 import { DialogShareButton } from "./sharedialog"
-import { saveSvgAsPng } from "@/api/saveimage"
 import { saveAsJSON } from "@/api/exportjson"
 import { useSearch } from "@tanstack/react-router"
 import { DatePicker } from "../ui/datepicker"
@@ -62,6 +60,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table"
+import { BasketballCourtCanvas } from "../viz/court-canvas"
 
 const quarters = [
   { id: "1", name: "1st" },
@@ -80,9 +79,8 @@ function Home() {
   const [isGenShots, setIsGenShots] = React.useState<boolean>(false)
   const [playerSearchKey, setPlayerSearchKey] = React.useState<string>("")
   const initialLoad = React.useRef<boolean>(true)
-  const svgRef = React.useRef<SVGSVGElement>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
 
-  // 2003-10-27 -> 2024-04-13
   const {
     isFetching: isPlayersFetching,
     isError: isPlayerError,
@@ -272,13 +270,12 @@ function Home() {
     }
   }
 
-  const handleSavePNG = async () => {
-    if (svgRef.current) {
-      try {
-        await saveSvgAsPng(svgRef.current)
-      } catch (error) {
-        console.error("Failed to save PNG", error)
-      }
+  const handleSavePNG = () => {
+    if (canvasRef.current) {
+      const link = document.createElement("a")
+      link.download = "nba-shots.png"
+      link.href = canvasRef.current.toDataURL("image/png")
+      link.click()
     }
   }
 
@@ -384,7 +381,7 @@ function Home() {
   }, [isGenShots])
 
   return (
-    <div className="relative mx-auto flex min-h-svh max-w-4xl flex-col space-y-6 bg-background px-4 lg:space-y-10 lg:px-14 2xl:max-w-[1536px]">
+    <div className="relative mx-auto flex min-h-svh max-w-sm flex-col space-y-6 bg-background px-4 sm:max-w-screen-sm md:max-w-screen-md md:px-10 lg:max-w-4xl lg:space-y-10 lg:px-14 2xl:max-w-[1536px]">
       <div className="flex w-full flex-col items-start justify-items-start space-y-0 pt-10 lg:pt-16">
         <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
           nba shots
@@ -820,20 +817,23 @@ function Home() {
               <FileCode />
             </ButtonWithTooltip>
           </div>
-          <div className="relative w-full">
-            {/* Spinner overlay */}
+          <div className="relative">
             {isShotsFetching && (
               <div className="absolute inset-0 z-10 flex items-center justify-center">
                 <LoadingSpinner size={60} />
               </div>
             )}
-            {/* Basketball Court */}
             {isShotsError ? (
               <div>{`Error fetching shots: ${shotsError.message}`}</div>
             ) : (
-              <div className="aspect-square max-h-[85vh] w-full">
-                <BasketballCourt ref={svgRef} shots={shotsData?.shots} />
-              </div>
+              <>
+                <div className="">
+                  <BasketballCourtCanvas
+                    ref={canvasRef}
+                    shots={shotsData?.shots}
+                  />
+                </div>
+              </>
             )}
           </div>
           <Table>
