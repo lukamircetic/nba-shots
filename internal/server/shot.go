@@ -25,6 +25,8 @@ type shotAggregates struct {
 	Missed3PtShots   int64 `json:"missed_3pt_shots"`
 }
 
+type ReturnShots []types.ReturnShot
+
 type ShotResponse struct {
 	shotAggregates
 	Shots []types.ReturnShot `json:"shots"`
@@ -84,9 +86,15 @@ func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewShotResponse(shotAggs *shotAggregates, shots *[]types.ReturnShot) *ShotResponse {
+	var shotsList []types.ReturnShot
+	if len(*shots) == 0 {
+		shotsList = make(ReturnShots, 0)
+	} else {
+		shotsList = *shots
+	}
 	resp := &ShotResponse{
 		shotAggregates: *shotAggs,
-		Shots:          *shots,
+		Shots:          shotsList,
 	}
 	return resp
 }
