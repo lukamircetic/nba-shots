@@ -52,6 +52,7 @@ import { useStringFilterManagement } from "../filter/useStringFilterManagement"
 import { Capitalize } from "@/api/helpers"
 import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
 import { TimePickerDemo } from "../ui/time-picker"
+import { LoadingSpinner } from "../ui/loading-spinner"
 
 const quarters = [
   { id: "1", name: "1st" },
@@ -74,7 +75,7 @@ function Home() {
 
   // 2003-10-27 -> 2024-04-13
   const {
-    isPending: isPlayerPending,
+    isFetching: isPlayersFetching,
     isError: isPlayerError,
     data: playerData,
     error: playerError,
@@ -88,7 +89,7 @@ function Home() {
   })
 
   const {
-    isPending: isTeamPending,
+    isFetching: isTeamPending,
     isError: isTeamError,
     data: teamData,
     error: teamError,
@@ -98,7 +99,7 @@ function Home() {
   })
 
   const {
-    isPending: isSeasonPending,
+    isFetching: isSeasonPending,
     isError: isSeasonError,
     data: seasonData,
     error: seasonError,
@@ -232,7 +233,7 @@ function Home() {
   // TODO: Show loading and error states for url param loading
   // TODO: This request gets sent everytime a player gets added... fix this
   const {
-    // isFetching: isParamPlayersFetching,
+    isFetching: isParamPlayersFetching,
     // isError: isParamPlayersError,
     data: paramPlayersData,
     // error: paramPlayersError,
@@ -389,7 +390,7 @@ function Home() {
           </h3>
           <Accordion type="multiple">
             <AccordionItem value="item-1">
-              <AccordionTrigger>Players</AccordionTrigger>
+              <AccordionTrigger>Player</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <InputWithButton
@@ -397,9 +398,9 @@ function Home() {
                     setValue={setPlayerSearchKey}
                   />
                   <FilterSection
-                    title="Players"
+                    title="Player"
                     items={searchedPlayers}
-                    isLoading={isPlayerPending}
+                    isLoading={isPlayersFetching}
                     isError={isPlayerError}
                     error={isPlayerError ? playerError : null}
                     onSelect={handlePlayerSelection}
@@ -409,11 +410,11 @@ function Home() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
-              <AccordionTrigger>Teams</AccordionTrigger>
+              <AccordionTrigger>Team</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <FilterSection
-                    title="Teams"
+                    title="Team"
                     items={searchedTeams}
                     isLoading={isTeamPending}
                     isError={isTeamError}
@@ -425,11 +426,11 @@ function Home() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>Seasons</AccordionTrigger>
+              <AccordionTrigger>Season</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <FilterSection
-                    title="Seasons"
+                    title="Season"
                     items={searchedSeasons}
                     isLoading={isSeasonPending}
                     isError={isSeasonError}
@@ -442,11 +443,11 @@ function Home() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-4">
-              <AccordionTrigger>Opposing Team</AccordionTrigger>
+              <AccordionTrigger>Opponent</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <FilterSection
-                    title="Opposing Team"
+                    title="Opponent"
                     items={searchedOppTeams}
                     isLoading={isTeamPending}
                     isError={isTeamError}
@@ -458,7 +459,7 @@ function Home() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-5">
-              <AccordionTrigger>Game Date</AccordionTrigger>
+              <AccordionTrigger>Date</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <p className="text-sm sm:text-base">Start Date</p>
@@ -483,7 +484,7 @@ function Home() {
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-6">
-              <AccordionTrigger>Game Location</AccordionTrigger>
+              <AccordionTrigger>Location</AccordionTrigger>
               <AccordionContent>
                 <div className="ml-[1px] max-w-sm space-y-4">
                   <RadioGroup
@@ -591,7 +592,11 @@ function Home() {
           </h3>
           <div>
             <ul className="grid grid-cols-2 gap-1 sm:grid-cols-1 md:grid-cols-2 2xl:grid-cols-1">
+              {isParamPlayersFetching && (
+                <LoadingSpinner className="w-full justify-center" />
+              )}
               {selectedPlayers &&
+                !isParamPlayersFetching &&
                 (searchedPlayers?.length !== 0 ||
                   selectedPlayers.length <= 5) &&
                 selectedPlayers.map((player, key) => (
@@ -607,6 +612,7 @@ function Home() {
                 ))}
               {/* basically if you select all, and theres more than 5 players it shows a summary of the search key instead of all the players */}
               {selectedPlayers &&
+                !isParamPlayersFetching &&
                 selectedPlayers.length > 5 &&
                 searchedPlayers?.length === 0 && (
                   <li>
@@ -708,7 +714,10 @@ function Home() {
                 <li>
                   <DestructiveButton
                     id=""
-                    value={selectedQuarter.map((q) => q.name).join(", ")}
+                    value={selectedQuarter
+                      .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+                      .map((q) => q.name)
+                      .join(", ")}
                     handleClick={handleRemoveAllQuarter}
                   >
                     <Clock9 className="size-4 sm:size-5" />
@@ -769,9 +778,14 @@ function Home() {
               variant="default"
               size="lg"
               onClick={onGenShotsClick}
-              className="self-center lg:px-10"
+              className="min-w-56 self-center lg:px-10"
             >
-              <Pickaxe /> Generate Shot Chart
+              {isShotsFetching && <LoadingSpinner />}
+              {!isShotsFetching && (
+                <>
+                  <Pickaxe /> Generate Shot Chart
+                </>
+              )}
             </Button>
           </div>
         </div>
@@ -796,18 +810,21 @@ function Home() {
               <FileCode />
             </ButtonWithTooltip>
           </div>
-          <div className="w-full">
-            <div className="">
-              {isShotsFetching && <div>Loading...</div>}
-              {isShotsError && (
-                <div>{`Error fetching shots: ${shotsError.message}`}</div>
-              )}
-              {
-                <div className="aspect-square max-h-[85vh] w-full">
-                  <BasketballCourt ref={svgRef} shots={shotsData} />
-                </div>
-              }
-            </div>
+          <div className="relative w-full">
+            {/* Spinner overlay */}
+            {isShotsFetching && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center">
+                <LoadingSpinner size={60} />
+              </div>
+            )}
+            {/* Basketball Court */}
+            {isShotsError ? (
+              <div>{`Error fetching shots: ${shotsError.message}`}</div>
+            ) : (
+              <div className="aspect-square max-h-[85vh] w-full">
+                <BasketballCourt ref={svgRef} shots={shotsData} />
+              </div>
+            )}
           </div>
         </div>
       </div>

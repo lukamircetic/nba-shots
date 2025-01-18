@@ -1,5 +1,6 @@
 import { BadgeWithButton } from "../ui/badgewithbutton"
 import { Button } from "../ui/button"
+import { LoadingSpinner } from "../ui/loading-spinner"
 import { ScrollArea } from "../ui/scroll-area"
 import { FilterItem } from "./types"
 
@@ -24,7 +25,7 @@ export function FilterSection<T extends FilterItem>({
   onSelectAll,
   nameKey = "name" as keyof T,
 }: FilterSectionProps<T>) {
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading) return <LoadingSpinner className="w-full justify-center" />
   if (isError) return <div>{`Error fetching ${title}: ${error?.message}`}</div>
   if (items && items.length > 0) {
     return (
