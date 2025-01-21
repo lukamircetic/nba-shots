@@ -16,10 +16,6 @@ WORKDIR /app
 COPY --from=build /app/main /app/main
 COPY --from=build /app/ingest /app/ingest
 
-RUN apk add --no-cache make && go install github.com/air-verse/air@latest
-EXPOSE ${PORT}
-CMD ["air"]
-
 FROM node:20 AS frontend_builder
 WORKDIR /frontend
 
