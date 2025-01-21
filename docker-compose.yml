@@ -16,8 +16,6 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_SCHEMA: ${DB_SCHEMA}
-    volumes:
-      - air_config:/root/.air
     command: /app/main
     depends_on:
       psql_bp:
@@ -87,6 +85,5 @@ services:
         max-file: 10
 volumes:
   psql_volume_bp:
-  air_config:
 networks:
   blueprint:
