@@ -194,6 +194,7 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 	var all_data []rawShotData
 	var seasons []types.Season
 	for _, file := range files {
+		log.Println("Opening file: ", file)
 		f, err := os.Open(file)
 
 		if err != nil {
@@ -203,7 +204,7 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 
 		reader := csv.NewReader(f)
 		records, err := reader.ReadAll()
-
+		log.Println("Reading records: ", len(records))
 		if err != nil {
 			log.Fatalf("could not read CSV file %s. Err: %v", file, err)
 		}
@@ -220,7 +221,7 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 				})
 			}
 		}
-
+		log.Println("All data after this record insertion: ", len(all_data))
 		f.Close()
 	}
 	log.Println("Total records: ", len(all_data))
