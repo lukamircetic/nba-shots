@@ -60,128 +60,19 @@ func main() {
 		log.Fatalf("error checking if database is empty: %v", err)
 	}
 
-	if dbEmpty {
-		allData, seasons := readAndParseShotsCSV()
+	if !dbEmpty {
+		log.Printf("Database is populated, no need to ingest: %v", dbEmpty)
+		return
+	}
 
-		// get all unique players
-		players := allPlayers(allData)
-		log.Println("Total parsed players: ", len(*players))
-		// insert into db
-		log.Println("Inserting players to the database...")
-		err := dbService.InsertPlayers(*players)
-		// log.Println("Commit transaction error for players: ", err)
-		if err != nil {
-			log.Fatalf("error inserting players: %v", err)
-		}
-		log.Printf("Inserted %v players to the players table\n", len(*players))
+	err = readAndParseShotsCSV(dbService)
 
-		// get all unique teams
-		teams := allTeams(allData)
-		log.Println("Total teams: ", len(*teams))
-
-		// insert into db
-		log.Println("Inserting teams to the database...")
-		err = dbService.InsertTeams(*teams)
-		if err != nil {
-			log.Fatalf("error inserting teams: %v", err)
-		}
-		log.Printf("Inserted %v teams to the database\n", len(*teams))
-
-		// all unique seasons
-		log.Println("Total seasons: ", len(*seasons))
-		log.Println("Inserting seasons to the database...")
-		err = dbService.InsertSeasons(*seasons)
-		if err != nil {
-			log.Fatalf("error inserting seasons: %v", err)
-		}
-		log.Printf("Inserted %v seasons to the database\n", len(*seasons))
-
-		// get all unique games
-		games := allGames(allData)
-		log.Println("Total games: ", len(*games))
-		// insert into db
-		log.Println("Inserting games to the database...")
-		err = dbService.InsertGames(*games)
-		if err != nil {
-			log.Fatalf("error inserting games: %v", err)
-		}
-		log.Printf("Inserted %v games to the database\n", len(*games))
-
-		// get cleaned shots data
-		shots := allShots(allData)
-		log.Println("Total shots: ", len(*shots))
-		// insert into db
-		log.Println("Inserting shots to the database...")
-		err = dbService.InsertShots(*shots)
-		if err != nil {
-			log.Fatalf("error inserting shots: %v", err)
-		}
-		log.Printf("Inserted %v shots to the database\n", len(*shots))
-
-		playerTeams := allPlayerTeams(allData)
-		log.Println("Total playerTeams: ", len(*playerTeams))
-		// insert into db
-		log.Println("Inserting shots to the database...")
-		err = dbService.InsertPlayerTeams(*playerTeams)
-		if err != nil {
-			log.Fatalf("error inserting playerSeasons: %v", err)
-		}
-		log.Printf("Inserted %v player teams to the database\n", len(*playerTeams))
-
-		playerSeasons := allPlayerSeasons(allData)
-		log.Println("Total playerSeasons: ", len(*playerSeasons))
-		// insert into db
-		log.Println("Inserting player seasons to the database...")
-		err = dbService.InsertPlayerSeasons(*playerSeasons)
-		if err != nil {
-			log.Fatalf("error inserting playerSeasons: %v", err)
-		}
-		log.Printf("Inserted %v player seasons to the database\n", len(*playerSeasons))
-
-		playerGames := allPlayerGames(allData)
-		log.Println("Total playerGames: ", len(*playerGames))
-		// insert into db
-		log.Println("Inserting playerGames to the database...")
-		err = dbService.InsertPlayerGames(*playerGames)
-		if err != nil {
-			log.Fatalf("error inserting playerGames: %v", err)
-		}
-		log.Printf("Inserted %v player games to the database\n", len(*playerGames))
-
-		teamSeasons := allTeamSeasons(allData)
-		log.Println("Total teamSeasons: ", len(*teamSeasons))
-		// insert into db
-		log.Println("Inserting teamSeasons to the database...")
-		err = dbService.InsertTeamSeasons(*teamSeasons)
-		if err != nil {
-			log.Fatalf("error inserting teamSeasons: %v", err)
-		}
-		log.Printf("Inserted %v team seasons to the database\n", len(*teamSeasons))
-
-		teamGames := allTeamGames(allData)
-		log.Println("Total teamGames: ", len(*teamGames))
-		// insert into db
-		log.Println("Inserting teamGames to the database...")
-		err = dbService.InsertTeamGames(*teamGames)
-		if err != nil {
-			log.Fatalf("error inserting teamGames: %v", err)
-		}
-		log.Printf("Inserted %v team games to the database\n", len(*teamGames))
-
-		gameSeasons := allGameSeasons(allData)
-		log.Println("Total gameSeasons: ", len(*gameSeasons))
-		// insert into db
-		log.Println("Inserting gameSeasons to the database...")
-		err = dbService.InsertGameSeasons(*gameSeasons)
-		if err != nil {
-			log.Fatalf("error inserting gameSeasons: %v", err)
-		}
-		log.Printf("Inserted %v game seasons to the database\n", len(*gameSeasons))
-
+	if err != nil {
+		log.Fatalf("error parsing all files: %v", err)
 	}
 }
 
-func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
+func readAndParseShotsCSV(dbService database.Service) error {
 	// need to fix something with docker taking up a lot of disk space and it might be related to these files
 	// docker system prune -a -> this command removed 65gb lol
 	dataDir := filepath.Join("raw_data", "nbashots")
@@ -195,8 +86,6 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 	// need to combine all the shot records from one csv into a single slice
 	// then from there we will process the data for player, team, season, game
 	// once those tables are populated then shot can be populated
-	var all_data []rawShotData
-	var seasons []types.Season
 	for _, file := range files {
 		log.Println("Opening file: ", file)
 		f, err := os.Open(file)
@@ -208,11 +97,13 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 
 		reader := csv.NewReader(f)
 		records, err := reader.ReadAll()
-		log.Println("Reading records: ", len(records))
+		// log.Println("Reading records: ", len(records))
 		if err != nil {
 			log.Fatalf("could not read CSV file %s. Err: %v", file, err)
 		}
 
+		var all_data []rawShotData
+		var seasons []types.Season
 		for j, r := range records[1:] {
 			typedRow := parseShotRow(r)
 			all_data = append(all_data, typedRow)
@@ -225,11 +116,135 @@ func readAndParseShotsCSV() (*[]rawShotData, *[]types.Season) {
 				})
 			}
 		}
-		log.Println("All data after this record insertion: ", len(all_data))
+		log.Println("This files slice length: ", len(all_data))
+		err = uploadBatchShotData(dbService, &all_data, &seasons)
+
+		if err != nil {
+			log.Fatalf("Error uploading for file %s. Err: %v", file, err)
+		}
 		f.Close()
 	}
-	log.Println("Total records: ", len(all_data))
-	return &all_data, &seasons
+	log.Println("Completed csv reading")
+	return nil
+}
+
+func uploadBatchShotData(dbService database.Service, allData *[]rawShotData, seasons *[]types.Season) error {
+
+	// get all unique players
+	players := allPlayers(allData)
+	log.Println("Total parsed players: ", len(*players))
+	// insert into db
+	log.Println("Inserting players to the database...")
+	err := dbService.InsertPlayers(*players)
+	// log.Println("Commit transaction error for players: ", err)
+	if err != nil {
+		log.Fatalf("error inserting players: %v", err)
+	}
+	log.Printf("Inserted %v players to the players table\n", len(*players))
+
+	// get all unique teams
+	teams := allTeams(allData)
+	log.Println("Total teams: ", len(*teams))
+
+	// insert into db
+	log.Println("Inserting teams to the database...")
+	err = dbService.InsertTeams(*teams)
+	if err != nil {
+		log.Fatalf("error inserting teams: %v", err)
+	}
+	log.Printf("Inserted %v teams to the database\n", len(*teams))
+
+	// all unique seasons
+	log.Println("Total seasons: ", len(*seasons))
+	log.Println("Inserting seasons to the database...")
+	err = dbService.InsertSeasons(*seasons)
+	if err != nil {
+		log.Fatalf("error inserting seasons: %v", err)
+	}
+	log.Printf("Inserted %v seasons to the database\n", len(*seasons))
+
+	// get all unique games
+	games := allGames(allData)
+	log.Println("Total games: ", len(*games))
+	// insert into db
+	log.Println("Inserting games to the database...")
+	err = dbService.InsertGames(*games)
+	if err != nil {
+		log.Fatalf("error inserting games: %v", err)
+	}
+	log.Printf("Inserted %v games to the database\n", len(*games))
+
+	// get cleaned shots data
+	shots := allShots(allData)
+	log.Println("Total shots: ", len(*shots))
+	// insert into db
+	log.Println("Inserting shots to the database...")
+	err = dbService.InsertShots(*shots)
+	if err != nil {
+		log.Fatalf("error inserting shots: %v", err)
+	}
+	log.Printf("Inserted %v shots to the database\n", len(*shots))
+
+	playerTeams := allPlayerTeams(allData)
+	log.Println("Total playerTeams: ", len(*playerTeams))
+	// insert into db
+	log.Println("Inserting shots to the database...")
+	err = dbService.InsertPlayerTeams(*playerTeams)
+	if err != nil {
+		log.Fatalf("error inserting playerSeasons: %v", err)
+	}
+	log.Printf("Inserted %v player teams to the database\n", len(*playerTeams))
+
+	playerSeasons := allPlayerSeasons(allData)
+	log.Println("Total playerSeasons: ", len(*playerSeasons))
+	// insert into db
+	log.Println("Inserting player seasons to the database...")
+	err = dbService.InsertPlayerSeasons(*playerSeasons)
+	if err != nil {
+		log.Fatalf("error inserting playerSeasons: %v", err)
+	}
+	log.Printf("Inserted %v player seasons to the database\n", len(*playerSeasons))
+
+	playerGames := allPlayerGames(allData)
+	log.Println("Total playerGames: ", len(*playerGames))
+	// insert into db
+	log.Println("Inserting playerGames to the database...")
+	err = dbService.InsertPlayerGames(*playerGames)
+	if err != nil {
+		log.Fatalf("error inserting playerGames: %v", err)
+	}
+	log.Printf("Inserted %v player games to the database\n", len(*playerGames))
+
+	teamSeasons := allTeamSeasons(allData)
+	log.Println("Total teamSeasons: ", len(*teamSeasons))
+	// insert into db
+	log.Println("Inserting teamSeasons to the database...")
+	err = dbService.InsertTeamSeasons(*teamSeasons)
+	if err != nil {
+		log.Fatalf("error inserting teamSeasons: %v", err)
+	}
+	log.Printf("Inserted %v team seasons to the database\n", len(*teamSeasons))
+
+	teamGames := allTeamGames(allData)
+	log.Println("Total teamGames: ", len(*teamGames))
+	// insert into db
+	log.Println("Inserting teamGames to the database...")
+	err = dbService.InsertTeamGames(*teamGames)
+	if err != nil {
+		log.Fatalf("error inserting teamGames: %v", err)
+	}
+	log.Printf("Inserted %v team games to the database\n", len(*teamGames))
+
+	gameSeasons := allGameSeasons(allData)
+	log.Println("Total gameSeasons: ", len(*gameSeasons))
+	// insert into db
+	log.Println("Inserting gameSeasons to the database...")
+	err = dbService.InsertGameSeasons(*gameSeasons)
+	if err != nil {
+		log.Fatalf("error inserting gameSeasons: %v", err)
+	}
+	log.Printf("Inserted %v game seasons to the database\n", len(*gameSeasons))
+	return nil
 }
 
 func parseShotRow(row []string) rawShotData {

@@ -63,6 +63,7 @@ services:
       dockerfile: Dockerfile
       target: prod
     restart: no
+    # mem_limit: 500m
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
