@@ -1,5 +1,10 @@
 import { format } from "date-fns"
 
+const BACKEND_URL =
+  import.meta.env.VITE_ENV === "prod"
+    ? import.meta.env.VITE_BACKEND_URL_PROD
+    : import.meta.env.VITE_BACKEND_URL_DEV
+
 interface HasId {
   id: string
 }
@@ -62,7 +67,7 @@ type ShotResponse = {
 }
 
 export async function fetchPlayersByName(name: string) {
-  const response = await fetch(`http://localhost:8080/player?name=${name}`)
+  const response = await fetch(`${BACKEND_URL}/player?name=${name}`)
   const data: PlayerResponse[] = await response.json()
 
   if (!response.ok) {
@@ -77,7 +82,7 @@ export async function fetchPlayersByName(name: string) {
 
 export async function fetchPlayersByIds(playerIds: string) {
   const response = await fetch(
-    `http://localhost:8080/player/multi?player_id=${playerIds}`,
+    `${BACKEND_URL}/player/multi?player_id=${playerIds}`,
   )
   const data: PlayerResponse[] = await response.json()
 
@@ -92,7 +97,7 @@ export async function fetchPlayersByIds(playerIds: string) {
 }
 
 export async function fetchAllTeams() {
-  const response = await fetch(`http://localhost:8080/team/all`)
+  const response = await fetch(`${BACKEND_URL}/team/all`)
   const data: TeamResponse[] = await response.json()
 
   if (!response.ok) {
@@ -107,7 +112,7 @@ export async function fetchAllTeams() {
 }
 
 export async function fetchAllSeasons() {
-  const response = await fetch(`http://localhost:8080/season/all`)
+  const response = await fetch(`${BACKEND_URL}/season/all`)
   const data: SeasonResponse[] = await response.json()
 
   if (!response.ok) {
@@ -132,7 +137,7 @@ export async function fetchShotsWithFilters(
   sTL?: Date | undefined,
   eTL?: Date | undefined,
 ) {
-  let queryString = "http://localhost:8080/shots" + "?"
+  let queryString = `${BACKEND_URL}/shots` + "?"
   let filters = {
     player_id: players ? createIdFilterString(players) : undefined,
     team_id: teams ? createIdFilterString(teams) : undefined,
@@ -159,13 +164,24 @@ export async function fetchShotsWithFilters(
     throw new Error("Failed to fetch teams")
   }
 
-  const pctTotal = data.shots.length > 0 ? data.total_made_shots / data.shots.length * 100 : 0
+  const pctTotal =
+    data.shots.length > 0
+      ? (data.total_made_shots / data.shots.length) * 100
+      : 0
 
   const total2PtShots = data.made_2pt_shots + data.missed_2pt_shots
-  const pct2Pt = total2PtShots > 0 ? data.made_2pt_shots / (data.made_2pt_shots + data.missed_2pt_shots) * 100: 0
+  const pct2Pt =
+    total2PtShots > 0
+      ? (data.made_2pt_shots / (data.made_2pt_shots + data.missed_2pt_shots)) *
+        100
+      : 0
 
   const total3PtShots = data.made_3pt_shots + data.missed_3pt_shots
-  const pct3Pt = total3PtShots > 0 ? data.made_3pt_shots / (data.made_3pt_shots + data.missed_3pt_shots) * 100: 0
+  const pct3Pt =
+    total3PtShots > 0
+      ? (data.made_3pt_shots / (data.made_3pt_shots + data.missed_3pt_shots)) *
+        100
+      : 0
 
   return {
     totalMadeShots: data.total_made_shots,
@@ -186,7 +202,7 @@ export async function fetchShotsWithFilters(
       locY: shot.loc_y,
       shotMade: shot.shot_made,
       shotType: shot.shot_type,
-    }))
+    })),
   }
 }
 

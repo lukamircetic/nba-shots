@@ -23,6 +23,10 @@ services:
     networks:
       - blueprint
   frontend:
+    environment:
+      VITE_ENV: ${VITE_ENV}
+      VITE_BACKEND_URL_PROD: ${VITE_BACKEND_URL_PROD}
+      VITE_BACKEND_URL_DEV: ${VITE_BACKEND_URL_DEV}
     build:
       context: .
       dockerfile: Dockerfile
