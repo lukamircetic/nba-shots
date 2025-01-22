@@ -7,6 +7,7 @@ import (
 	"nba-shots/internal/types"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"strconv"
 	"time"
 )
@@ -44,6 +45,9 @@ type rawShotData struct {
 }
 
 func main() {
+	x, _ := os.Create("mem.pprof")
+	defer pprof.WriteHeapProfile(x)
+
 	log.Println("Starting ingest script 1")
 
 	dbService := database.New()
