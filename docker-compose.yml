@@ -31,6 +31,10 @@ services:
         - VITE_ENV=${VITE_ENV}
         - VITE_BACKEND_URL_PROD=${VITE_BACKEND_URL_PROD}
         - VITE_BACKEND_URL_DEV=${VITE_BACKEND_URL_DEV}
+    environment:
+      - VITE_ENV=${VITE_ENV}
+      - VITE_BACKEND_URL_PROD=${VITE_BACKEND_URL_PROD}
+      - VITE_BACKEND_URL_DEV=${VITE_BACKEND_URL_DEV}
     restart: unless-stopped
     depends_on:
       - app

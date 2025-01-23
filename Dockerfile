@@ -19,6 +19,12 @@ COPY --from=build /app/ingest /app/ingest
 FROM node:20 AS frontend_builder
 WORKDIR /frontend
 
+ARG VITE_ENV
+ARG VITE_BACKEND_URL_PROD
+ARG VITE_BACKEND_URL_DEV
+ENV WITE_ENV $VITE_ENV
+ENV VITE_BACKEND_URL_PROD $VITE_BACKEND_URL_PROD
+ENV VITE_BACKEND_URL_DEV $VITE_BACKEND_URL_DEV
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/. .
