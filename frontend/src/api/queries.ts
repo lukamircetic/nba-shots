@@ -67,6 +67,7 @@ type ShotResponse = {
 }
 
 export async function fetchPlayersByName(name: string) {
+  console.log(BACKEND_URL)
   const response = await fetch(`${BACKEND_URL}/player?name=${name}`)
   const data: PlayerResponse[] = await response.json()
 
@@ -81,6 +82,7 @@ export async function fetchPlayersByName(name: string) {
 }
 
 export async function fetchPlayersByIds(playerIds: string) {
+  console.log(BACKEND_URL)
   const response = await fetch(
     `${BACKEND_URL}/player/multi?player_id=${playerIds}`,
   )
@@ -97,6 +99,7 @@ export async function fetchPlayersByIds(playerIds: string) {
 }
 
 export async function fetchAllTeams() {
+  console.log(BACKEND_URL)
   const response = await fetch(`${BACKEND_URL}/team/all`)
   const data: TeamResponse[] = await response.json()
 
@@ -112,6 +115,7 @@ export async function fetchAllTeams() {
 }
 
 export async function fetchAllSeasons() {
+  console.log(BACKEND_URL)
   const response = await fetch(`${BACKEND_URL}/season/all`)
   const data: SeasonResponse[] = await response.json()
 
@@ -137,6 +141,7 @@ export async function fetchShotsWithFilters(
   sTL?: Date | undefined,
   eTL?: Date | undefined,
 ) {
+  console.log(BACKEND_URL)
   let queryString = `${BACKEND_URL}/shots` + "?"
   let filters = {
     player_id: players ? createIdFilterString(players) : undefined,
