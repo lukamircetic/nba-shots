@@ -2,6 +2,7 @@ import { format } from "date-fns"
 
 
 function getBackendUrl() {
+  console.log(import.meta.env)
   return import.meta.env.VITE_ENV === "prod"
     ? import.meta.env.VITE_BACKEND_URL_PROD
     : import.meta.env.VITE_BACKEND_URL_DEV;
