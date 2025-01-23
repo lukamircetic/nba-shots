@@ -1,9 +1,11 @@
 import { format } from "date-fns"
 
-const BACKEND_URL =
-  import.meta.env.VITE_ENV === "prod"
+
+function getBackendUrl() {
+  return import.meta.env.VITE_ENV === "prod"
     ? import.meta.env.VITE_BACKEND_URL_PROD
-    : import.meta.env.VITE_BACKEND_URL_DEV
+    : import.meta.env.VITE_BACKEND_URL_DEV;
+}
 
 interface HasId {
   id: string
@@ -67,8 +69,9 @@ type ShotResponse = {
 }
 
 export async function fetchPlayersByName(name: string) {
-  console.log(BACKEND_URL)
-  const response = await fetch(`${BACKEND_URL}/player?name=${name}`)
+  const url = getBackendUrl()
+  console.log(url)
+  const response = await fetch(`${url}/player?name=${name}`)
   const data: PlayerResponse[] = await response.json()
 
   if (!response.ok) {
@@ -82,9 +85,10 @@ export async function fetchPlayersByName(name: string) {
 }
 
 export async function fetchPlayersByIds(playerIds: string) {
-  console.log(BACKEND_URL)
+  const url = getBackendUrl()
+  console.log(url)
   const response = await fetch(
-    `${BACKEND_URL}/player/multi?player_id=${playerIds}`,
+    `${url}/player/multi?player_id=${playerIds}`,
   )
   const data: PlayerResponse[] = await response.json()
 
@@ -99,8 +103,9 @@ export async function fetchPlayersByIds(playerIds: string) {
 }
 
 export async function fetchAllTeams() {
-  console.log(BACKEND_URL)
-  const response = await fetch(`${BACKEND_URL}/team/all`)
+  const url = getBackendUrl()
+  console.log(url)
+  const response = await fetch(`${url}/team/all`)
   const data: TeamResponse[] = await response.json()
 
   if (!response.ok) {
@@ -115,8 +120,9 @@ export async function fetchAllTeams() {
 }
 
 export async function fetchAllSeasons() {
-  console.log(BACKEND_URL)
-  const response = await fetch(`${BACKEND_URL}/season/all`)
+  const url = getBackendUrl()
+  console.log(url)
+  const response = await fetch(`${url}/season/all`)
   const data: SeasonResponse[] = await response.json()
 
   if (!response.ok) {
@@ -141,8 +147,9 @@ export async function fetchShotsWithFilters(
   sTL?: Date | undefined,
   eTL?: Date | undefined,
 ) {
-  console.log(BACKEND_URL)
-  let queryString = `${BACKEND_URL}/shots` + "?"
+  const url = getBackendUrl()
+  console.log(url)
+  let queryString = `${url}/shots` + "?"
   let filters = {
     player_id: players ? createIdFilterString(players) : undefined,
     team_id: teams ? createIdFilterString(teams) : undefined,
