@@ -54,8 +54,6 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - psql_volume_bp:/var/lib/postgresql/data
-      - ./migrations:/docker-entrypoint-initdb.d/migrations
-      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
       test:
         ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}'"]
@@ -63,6 +61,24 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+    networks:
+      - blueprint
+  migrate:
+    image: postgres:latest
+    depends_on:
+      psql_bp:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/migrations
+      - ./init-db.sh:/init-db.sh
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_SCHEMA: ${DB_SCHEMA}
+      DB_HOST: psql_bp
+      DB_PORT: 5432
+    command: bash -c "chmod +x /init-db.sh && /init-db.sh"
     networks:
       - blueprint
   ingest:
@@ -84,6 +100,8 @@ services:
     depends_on:
       psql_bp:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - blueprint
     logging:
