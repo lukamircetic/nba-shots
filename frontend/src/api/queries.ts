@@ -1,71 +1,10 @@
+import { HasId, Player, PlayerResponse, Quarter, Season, SeasonResponse, Shot, ShotData, ShotResponseMetadata, Team, TeamResponse } from "@/types";
 import { format } from "date-fns"
-
 
 function getBackendUrl() {
   return import.meta.env.VITE_ENV === "prod"
     ? import.meta.env.VITE_BACKEND_URL_PROD
     : import.meta.env.VITE_BACKEND_URL_DEV;
-}
-
-interface HasId {
-  id: string
-}
-
-export interface Player extends HasId {
-  id: string
-  name: string
-}
-
-export interface Team extends HasId {
-  id: string
-  name: string
-}
-
-export interface Quarter extends HasId {
-  id: string
-  name: string
-}
-
-export interface Season extends HasId {
-  id: string
-  season_years: string
-}
-
-type PlayerResponse = {
-  id: number
-  name: string
-  elapsed: number
-}
-
-type TeamResponse = {
-  id: number
-  name: string
-  abbreviation: string
-  elapsed: number
-}
-
-type SeasonResponse = {
-  id: number
-  season_years: string
-  elapsed: number
-}
-
-type Shot = {
-  id: number
-  loc_x: number
-  loc_y: number
-  shot_made: boolean
-  shot_type: string
-}
-
-type ShotResponse = {
-  total_made_shots: number
-  total_missed_shots: number
-  made_2pt_shots: number
-  missed_2pt_shots: number
-  made_3pt_shots: number
-  missed_3pt_shots: number
-  shots: Shot[]
 }
 
 export async function fetchPlayersByName(name: string) {
@@ -80,7 +19,7 @@ export async function fetchPlayersByName(name: string) {
   return data.map((player) => ({
     id: player.id.toString(),
     name: player.name,
-  }))
+  } as Player))
 }
 
 export async function fetchPlayersByIds(playerIds: string) {
@@ -97,7 +36,7 @@ export async function fetchPlayersByIds(playerIds: string) {
   return data.map((player) => ({
     id: player.id.toString(),
     name: player.name,
-  }))
+  } as Player))
 }
 
 export async function fetchAllTeams() {
@@ -113,7 +52,7 @@ export async function fetchAllTeams() {
     id: team.id.toString(),
     name: team.name,
     abbreviation: team.abbreviation,
-  }))
+  } as Team))
 }
 
 export async function fetchAllSeasons() {
@@ -128,7 +67,7 @@ export async function fetchAllSeasons() {
   return data.map((season) => ({
     id: season.id.toString(),
     season_years: season.season_years,
-  }))
+  } as Season))
 }
 
 export async function fetchShotsWithFilters(
@@ -165,7 +104,7 @@ export async function fetchShotsWithFilters(
   })
 
   const response = await fetch(queryString)
-  const data: ShotResponse = await response.json()
+  const data: ShotResponseMetadata = await response.json()
 
   if (!response.ok) {
     throw new Error("Failed to fetch teams")
@@ -209,8 +148,8 @@ export async function fetchShotsWithFilters(
       locY: shot.loc_y,
       shotMade: shot.shot_made,
       shotType: shot.shot_type,
-    })),
-  }
+    } as Shot)),
+  } as ShotData
 }
 
 function createIdFilterString(arr: HasId[]) {
