@@ -64,6 +64,11 @@ export interface Season extends HasId {
   season_years: string
 }
 
+export interface Quarter extends HasId {
+  id: string
+  name: string
+}
+
 export type PlayerResponse = {
   id: number
   name: string

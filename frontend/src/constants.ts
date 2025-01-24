@@ -1,4 +1,6 @@
-export const quarters = [
+import { Quarter } from "./types";
+
+export const quarters: Quarter[] = [
   { id: "1", name: "1st" },
   { id: "2", name: "2nd" },
   { id: "3", name: "3rd" },
