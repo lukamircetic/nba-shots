@@ -257,7 +257,7 @@ function Home() {
     }
   }
 
-  // TODO: This url param loading stuff is really messy, cleanup
+  // TODO: Clean this logic up for performance
   React.useEffect(() => {
     if (
       initialLoad.current &&
