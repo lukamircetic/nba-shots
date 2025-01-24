@@ -2,7 +2,6 @@ import { format } from "date-fns"
 
 
 function getBackendUrl() {
-  console.log(import.meta.env)
   return import.meta.env.VITE_ENV === "prod"
     ? import.meta.env.VITE_BACKEND_URL_PROD
     : import.meta.env.VITE_BACKEND_URL_DEV;
@@ -71,7 +70,6 @@ type ShotResponse = {
 
 export async function fetchPlayersByName(name: string) {
   const url = getBackendUrl()
-  console.log(url)
   const response = await fetch(`${url}/player?name=${name}`)
   const data: PlayerResponse[] = await response.json()
 
@@ -87,7 +85,6 @@ export async function fetchPlayersByName(name: string) {
 
 export async function fetchPlayersByIds(playerIds: string) {
   const url = getBackendUrl()
-  console.log(url)
   const response = await fetch(
     `${url}/player/multi?player_id=${playerIds}`,
   )
@@ -105,7 +102,6 @@ export async function fetchPlayersByIds(playerIds: string) {
 
 export async function fetchAllTeams() {
   const url = getBackendUrl()
-  console.log(url)
   const response = await fetch(`${url}/team/all`)
   const data: TeamResponse[] = await response.json()
 
@@ -122,7 +118,6 @@ export async function fetchAllTeams() {
 
 export async function fetchAllSeasons() {
   const url = getBackendUrl()
-  console.log(url)
   const response = await fetch(`${url}/season/all`)
   const data: SeasonResponse[] = await response.json()
 
@@ -149,7 +144,6 @@ export async function fetchShotsWithFilters(
   eTL?: Date | undefined,
 ) {
   const url = getBackendUrl()
-  console.log(url)
   let queryString = `${url}/shots` + "?"
   let filters = {
     player_id: players ? createIdFilterString(players) : undefined,
