@@ -259,12 +259,12 @@ function Home() {
 
   // TODO: Clean this logic up for performance
   React.useEffect(() => {
-    if (
-      initialLoad.current &&
-      (paramPlayersData !== undefined ||
-        teamData !== undefined ||
-        seasonData !== undefined)
-    ) {
+    const loadUrlParams = async () => {
+      if (!paramPlayersData || !teamData || !seasonData) return
+      if (!initialLoad.current) return
+      initialLoad.current = false
+
+      console.log("initial load", paramPlayersData, teamData, seasonData)
       initialLoad.current = false
       if (search.players !== undefined && paramPlayersData !== undefined) {
         for (const player of paramPlayersData) {
@@ -331,10 +331,12 @@ function Home() {
 
       setIsGenShots(true)
     }
+    loadUrlParams()
   }, [paramPlayersData, teamData, seasonData])
 
   React.useEffect(() => {
     if (isGenShots) {
+      console.log("gen shots", selectedPlayers, selectedTeams, selectedSeasons)
       handleGenShots()
       setIsGenShots(false)
     }
