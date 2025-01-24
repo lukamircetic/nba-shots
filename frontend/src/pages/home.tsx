@@ -3,25 +3,21 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../ui/accordion"
-import { InputWithButton } from "../ui/inputwithbutton"
+} from "../components/ui/accordion"
+import { InputWithButton } from "../components/ui/inputwithbutton"
 import React from "react"
-import { Button } from "../ui/button"
+import { Button } from "../components/ui/button"
 import {
   fetchAllSeasons,
   fetchAllTeams,
   fetchPlayersByIds,
   fetchPlayersByName,
   fetchShotsWithFilters,
-  Player,
-  Quarter,
-  Season,
-  Team,
 } from "@/api/queries"
 import { useQuery } from "@tanstack/react-query"
-import { DestructiveButton } from "../ui/destructivebutton"
-import { useFilterManagement } from "../filter/useFilterManagement"
-import { FilterSection } from "../filter/FilterSection"
+import { DestructiveButton } from "../components/ui/destructivebutton"
+import { useFilterManagement } from "../components/filter/useFilterManagement"
+import { FilterSection } from "../components/filter/FilterSection"
 import {
   CalendarArrowDown,
   CalendarArrowUp,
@@ -37,41 +33,24 @@ import {
   UserRound,
   UsersRound,
 } from "lucide-react"
-import { ButtonWithTooltip } from "../ui/buttonwithtooltip"
-import { DialogShareButton } from "./sharedialog"
+import { ButtonWithTooltip } from "../components/ui/buttonwithtooltip"
+import { DialogShareButton } from "../components/share-dialog/sharedialog"
 import { saveAsJSON } from "@/api/exportjson"
 import { useSearch } from "@tanstack/react-router"
-import { DatePicker } from "../ui/datepicker"
+import { DatePicker } from "../components/ui/datepicker"
 import { format } from "date-fns"
-import { useDateFilterManagement } from "../filter/useDateFilterManagement"
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group"
-import { Label } from "../ui/label"
-import { useStringFilterManagement } from "../filter/useStringFilterManagement"
+import { useDateFilterManagement } from "../components/filter/useDateFilterManagement"
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group"
+import { Label } from "../components/ui/label"
+import { useStringFilterManagement } from "../components/filter/useStringFilterManagement"
 import { Capitalize } from "@/api/helpers"
-import { ToggleGroup, ToggleGroupItem } from "../ui/toggle-group"
-import { TimePickerDemo } from "../ui/time-picker"
-import { LoadingSpinner } from "../ui/loading-spinner"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table"
-import { BasketballCourtCanvas } from "../viz/court-canvas"
-
-const quarters = [
-  { id: "1", name: "1st" },
-  { id: "2", name: "2nd" },
-  { id: "3", name: "3rd" },
-  { id: "4", name: "4th" },
-  { id: "5", name: "OT" },
-  { id: "6", name: "2OT" },
-  { id: "7", name: "3OT" },
-  { id: "8", name: "4OT" },
-]
+import { ToggleGroup, ToggleGroupItem } from "../components/ui/toggle-group"
+import { TimePickerDemo } from "../components/ui/time-picker"
+import { LoadingSpinner } from "../components/ui/loading-spinner"
+import { BasketballCourtCanvas } from "../components/viz/court-canvas"
+import { quarters } from "../constants"
+import { StatsTable } from "@/components/stats-table/stats-table"
+import { Player, Quarter, Season, Team } from "@/types"
 
 function Home() {
   const search = useSearch({ from: "/" })
@@ -220,7 +199,6 @@ function Home() {
     queryFn: ({ queryKey }) => {
       const [players, teams, seasons, opps, sDate, eDate, gLoc, qtr, sTL, eTL] =
         queryKey
-      // const stMins = sTL.
       return fetchShotsWithFilters(
         players as Player[] | undefined,
         teams as Team[] | undefined,
@@ -836,49 +814,7 @@ function Home() {
               </>
             )}
           </div>
-          <Table>
-            {shotsData ? (
-              <TableCaption>The stats for the queried shots.</TableCaption>
-            ) : (
-              <TableCaption>No shots found for this query.</TableCaption>
-            )}
-            <TableHeader>
-              <TableRow>
-                <TableHead className="">Type</TableHead>
-                <TableHead>Made</TableHead>
-                <TableHead>Missed</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Percentage</TableHead>
-              </TableRow>
-            </TableHeader>
-            {shotsData && (
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">2PT FG</TableCell>
-                  <TableCell>{shotsData?.made2PtShots}</TableCell>
-                  <TableCell>{shotsData?.missed2PtShots}</TableCell>
-                  <TableCell>{shotsData?.total2PtShots}</TableCell>
-                  <TableCell>{`${shotsData?.pct2Pt}%`}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">3PT FG</TableCell>
-                  <TableCell>{shotsData?.made3PtShots}</TableCell>
-                  <TableCell>{shotsData?.missed3PtShots}</TableCell>
-                  <TableCell>{shotsData?.total3PtShots}</TableCell>
-                  <TableCell>{`${shotsData?.pct3Pt}%`}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">All FG</TableCell>
-                  <TableCell>{shotsData?.totalMadeShots}</TableCell>
-                  <TableCell>{shotsData?.totalMissedShots}</TableCell>
-                  <TableCell>
-                    {shotsData ? shotsData.shots.length : 0}
-                  </TableCell>
-                  <TableCell>{`${shotsData?.pctTotal}%`}</TableCell>
-                </TableRow>
-              </TableBody>
-            )}
-          </Table>
+          <StatsTable shotsData={shotsData} />
         </div>
       </div>
     </div>
