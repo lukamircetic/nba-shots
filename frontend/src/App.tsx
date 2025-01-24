@@ -8,7 +8,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Home />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {import.meta.env.VITE_ENV === "dev" && (
+        <ReactQueryDevtools initialIsOpen={false} />
+      )}
     </QueryClientProvider>
   )
 }
