@@ -81,13 +81,14 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	s.APIDocs = htmlBuffer.Bytes()
 
-	r.Get("/", s.HelloWorldHandler)
+	r.Get("/", s.rootHandler)
 
 	return r
 }
 
-func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(s.APIDocs)
 }
 
