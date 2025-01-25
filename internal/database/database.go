@@ -27,6 +27,7 @@ type Service interface {
 	InsertTeamSeasons([]types.TeamSeason) error
 	InsertTeamGames([]types.TeamGame) error
 	InsertGameSeasons([]types.GameSeason) error
+	InsertQueryHistory(context.Context, *types.QueryHistoryRecord) error
 	QueryShots(string, []interface{}, int) ([]types.ReturnShot, error)
 
 	GetShots(*types.RequestShotParams) ([]types.ReturnShot, error)

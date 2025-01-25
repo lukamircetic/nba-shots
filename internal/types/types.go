@@ -111,7 +111,7 @@ type RequestShotParams struct {
 }
 
 type QueryHistoryRecord struct {
-	*RequestShotParams
+	RequestShotParams
 	ReturnedShots int `json:"returned_shots" db:"returned_shots"`
 }
 

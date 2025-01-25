@@ -4,6 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -50,4 +53,46 @@ func (s *service) IsEmptyDatabase() (bool, error) {
 	}
 	log.Println("Database is empty")
 	return true, nil
+}
+
+func formatPGIntArray(arr *[]int) *string {
+	if arr == nil || len(*arr) == 0 {
+		return nil
+	}
+
+	var str strings.Builder
+	str.WriteString("{")
+	for id, item := range *arr {
+		str.WriteString(strconv.Itoa(item))
+		if id < len(*arr)-1 {
+			str.WriteString(",")
+		}
+	}
+	str.WriteString("}")
+
+	result := str.String()
+
+	return &result
+}
+
+func formatNullableDate(date time.Time) *time.Time {
+	if date.IsZero() {
+		return nil
+	}
+	return &date
+}
+
+func formatNullableString(str string) *string {
+	if str == "" {
+		return nil
+	}
+	return &str
+}
+
+// number can only be positive for this case
+func formatNullableInt(num int) *int {
+	if num == -1 {
+		return nil
+	}
+	return &num
 }
