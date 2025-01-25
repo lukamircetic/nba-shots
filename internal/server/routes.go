@@ -71,7 +71,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 		ProjectPath: "github.com/lukamircetic/nba-shots",
 		Intro:       "Welcome to the nba-shots GO api docs",
 	})
-	log.Println(markdownDoc)
+
 	var htmlBuffer bytes.Buffer
 	err := goldmark.Convert([]byte(markdownDoc), &htmlBuffer)
 
