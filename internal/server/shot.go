@@ -74,6 +74,26 @@ func (s *Server) getShotsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 2.5 - insert the current query params into the shot history table
+	// essentially i have a table called query_history that i would like to keep a history of requests people have made
+	// each record would contain all of the arguments from queryArgs and the len(shots) of returned shots from above
+	// can i make this run as a go routine so it doesnt slow down the response (whether this fails or not shouldnt affect the user)
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		queryHistoryRecord := &types.QueryHistoryRecord{
+			RequestShotParams: *queryArgs,
+			ReturnedShots:     len(shots),
+		}
+
+		err := s.db.InsertQueryHistory(ctx, queryHistoryRecord)
+
+		if err != nil {
+			log.Printf("Error logging the query history: %v\n", err)
+		}
+	}()
+
 	// 3 - calc shot stat aggregates
 	shotAggs := s.getShotAggregates(&shots)
 

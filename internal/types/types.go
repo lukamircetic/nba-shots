@@ -98,16 +98,21 @@ type PlayerTeamSeason struct {
 }
 
 type RequestShotParams struct {
-	PlayerIDs         []int     `json:"player_id"`
-	TeamIDs           []int     `json:"team_id"`
-	SeasonYears       []int     `json:"season_year"`
-	OpposingTeamIds   []int     `json:"opposing_team_id"`
-	StartGameDate     time.Time `json:"start_game_date"`
-	EndGameDate       time.Time `json:"end_game_date"`
-	GameLocation      string    `json:"game_location"`
-	Quarters          []int     `json:"quarter"`
-	StartTimeLeftSecs int       `json:"start_time_left"`
-	EndTimeLeftSecs   int       `json:"end_time_left"`
+	PlayerIDs         []int     `json:"player_id" db:"player_id"`
+	TeamIDs           []int     `json:"team_id" db:"team_id"`
+	SeasonYears       []int     `json:"season_year" db:"season_year"`
+	OpposingTeamIds   []int     `json:"opposing_team_id" db:"opp_team_id"`
+	StartGameDate     time.Time `json:"start_game_date" db:"start_game_date"`
+	EndGameDate       time.Time `json:"end_game_date" db:"end_game_date"`
+	GameLocation      string    `json:"game_location" db:"game_location"`
+	Quarters          []int     `json:"quarter" db:"quarter"`
+	StartTimeLeftSecs int       `json:"start_time_left" db:"start_time_left"`
+	EndTimeLeftSecs   int       `json:"end_time_left" db:"end_time_left"`
+}
+
+type QueryHistoryRecord struct {
+	RequestShotParams
+	ReturnedShots int `json:"returned_shots" db:"returned_shots"`
 }
 
 func NewRequestShotParams() *RequestShotParams {

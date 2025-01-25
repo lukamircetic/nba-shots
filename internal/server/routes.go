@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -8,7 +9,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/go-chi/docgen"
 	"github.com/go-chi/render"
+	"github.com/yuin/goldmark"
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
@@ -27,8 +30,6 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true,
 		MaxAge:           300,
 	}))
-
-	r.Get("/", s.HelloWorldHandler)
 
 	r.Get("/health", s.healthHandler)
 
@@ -66,19 +67,29 @@ func (s *Server) RegisterRoutes() http.Handler {
 		r.Get("/", s.getShotsHandler)
 	})
 
+	markdownDoc := docgen.MarkdownRoutesDoc(r, docgen.MarkdownOpts{
+		ProjectPath: "github.com/lukamircetic/nba-shots",
+		Intro:       "Welcome to the nba-shots GO api docs",
+	})
+
+	var htmlBuffer bytes.Buffer
+	err := goldmark.Convert([]byte(markdownDoc), &htmlBuffer)
+
+	if err != nil {
+		log.Println("Unable to convert docs into hmtl", err)
+	}
+
+	s.APIDocs = htmlBuffer.Bytes()
+
+	r.Get("/", s.rootHandler)
+
 	return r
 }
 
-func (s *Server) HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	resp := make(map[string]string)
-	resp["message"] = "Hello World"
-
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("error handling JSON marshal. Err: %v", err)
-	}
-
-	_, _ = w.Write(jsonResp)
+func (s *Server) rootHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(s.APIDocs)
 }
 
 func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {

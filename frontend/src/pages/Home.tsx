@@ -336,7 +336,6 @@ function Home() {
 
   React.useEffect(() => {
     if (isGenShots) {
-      console.log("gen shots", selectedPlayers, selectedTeams, selectedSeasons)
       handleGenShots()
       setIsGenShots(false)
     }

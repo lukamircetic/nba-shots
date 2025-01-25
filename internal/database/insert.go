@@ -517,3 +517,53 @@ func (s *service) InsertGameSeasons(gameSeasons []types.GameSeason) error {
 	return s.commitTransaction(tx)
 
 }
+
+func (s *service) InsertQueryHistory(ctx context.Context, qh *types.QueryHistoryRecord) error {
+	tx, err := s.beginTransaction()
+	if err != nil {
+		return err
+	}
+	log.Printf("Attempting to insert the queryHistory record for %v shots\n", qh.ReturnedShots)
+
+	query := `
+	INSERT INTO query_history (
+    player_id,
+    team_id,
+    season_year,
+		opp_team_id,
+    quarter,
+    start_game_date,
+    end_game_date,
+    game_location,
+    start_time_left,
+    end_time_left,
+    returned_shots
+	)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	`
+
+	// format the array values
+	_, err = s.db.Exec(ctx, query,
+		formatPGIntArray(&qh.PlayerIDs),
+		formatPGIntArray(&qh.TeamIDs),
+		formatPGIntArray(&qh.SeasonYears),
+		formatPGIntArray(&qh.OpposingTeamIds),
+		formatPGIntArray(&qh.Quarters),
+		formatNullableDate(qh.StartGameDate),
+		formatNullableDate(qh.EndGameDate),
+		formatNullableString(qh.GameLocation),
+		formatNullableInt(qh.StartTimeLeftSecs),
+		formatNullableInt(qh.EndTimeLeftSecs),
+		qh.ReturnedShots,
+	)
+
+	if err != nil {
+		log.Printf("query log exec: %v\n", err)
+		err2 := s.rollbackTransaction(tx)
+		if err2 != nil {
+			return fmt.Errorf("error inserting game seasons and rolling back: %v, %v", err, err2)
+		}
+		return err
+	}
+	return s.commitTransaction(tx)
+}
