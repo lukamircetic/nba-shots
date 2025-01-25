@@ -67,6 +67,7 @@ services:
       - blueprint
   migrate:
     image: postgres:latest
+    restart: "no"
     depends_on:
       psql_bp:
         condition: service_healthy
