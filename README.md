@@ -42,9 +42,12 @@ make clean
 If you don't want to use docker, you can build/run the components using go and npm for the api and frontend, respectively.
 
 ## Future Plans
-- Generate a shot heatmap for queries with a lot of shots
-- CRON job for fetching new shots (dataset is from 2003-2024 seasons)
-- Feel free to open an issue to request more features
+
+- [ ] Known Issue: Dataset shot locations need to be fixed for 2019-2022
+- [ ] Be able to search for specific games and have a game view
+- [ ] Generate a shot heatmap for queries with a lot of shots
+- [ ] CRON job for fetching new shots (dataset is from 2003-2024 seasons)
+- [ ] Feel free to open an issue to request more features
 
 ## Inspiration
 
