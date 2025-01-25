@@ -20,6 +20,8 @@ services:
     depends_on:
       psql_bp:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     networks:
       - blueprint
   frontend:
