@@ -1,6 +1,4 @@
 [![Website](https://img.shields.io/website?label=nbashots.lukamircetic.ca&style=flat-square&url=https%3A%2F%2Fnbashots.lukamircetic.ca)](https://nbashots.lukamircetic.ca)
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fapi.nbashots.lukamircetic.ca%2Fhealth&label=api.nbashots.lukamircetic.ca
-)](https://api.nbashots.lukamircetic.ca)
 
 # nba shots
 
